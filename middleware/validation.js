@@ -24,6 +24,17 @@ const validateAmount = catchAsyncError(async (req, res, next) => {
   next();
 });
 
+// Custom validation for exchange USDT amount
+const validateUsdtAmount = catchAsyncError(async (req, res, next) => {
+  const { usdtAmount } = req.body;
+  
+  if (!usdtAmount || typeof usdtAmount !== 'number' || usdtAmount <= 0) {
+    return next(new ErrorHandler('USDT amount must be a positive number', 400));
+  }
+  
+  next();
+});
+
 const validateObjectId = (paramName = 'id') => {
   return catchAsyncError(async (req, res, next) => {
     const id = req.params[paramName];
@@ -54,6 +65,7 @@ const validatePagination = catchAsyncError(async (req, res, next) => {
 module.exports = {
   validatePhoneNumber,
   validateAmount,
+  validateUsdtAmount,
   validateObjectId,
   validatePagination
 };

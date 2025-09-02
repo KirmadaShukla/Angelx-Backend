@@ -1,7 +1,8 @@
 const DepositMethod = require('../models/DepositMethod');
 const Deposit = require('../models/Deposit');
-const Transaction = require('../models/Transaction');
 const User = require('../models/User');
+const Transaction = require('../models/Transaction');
+const ExchangeRate = require('../models/ExchangeRate');
 const catchAsyncError = require('../utils/catchAsyncError');
 const { ErrorHandler } = require('../utils/ErrorHandler');
 
@@ -278,18 +279,32 @@ const updateDepositStatus = catchAsyncError(async (req, res, next) => {
   const oldStatus = deposit.status;
   deposit.status = status;
 
-  // If deposit is completed, add amount to user balance
+  // If deposit is completed, convert INR to USDT and add to user balance
   if (status === 'completed' && oldStatus !== 'completed') {
     const user = await User.findById(deposit.userId._id);
     if (user) {
-      user.balance += deposit.amount;
+      // Get current exchange rate
+      let rateDoc = await ExchangeRate.findOne().sort({ createdAt: -1 });
+      
+      if (!rateDoc) {
+        return next(new ErrorHandler('Exchange rate not available', 500));
+      }
+
+      const exchangeRate = rateDoc.dollarRate;
+      
+      // Convert INR deposit amount to USDT
+      // Formula: USDT = INR / exchangeRate
+      const usdtAmount = deposit.amount / exchangeRate;
+      
+      // Add USDT equivalent to user balance
+      user.balance += usdtAmount;
       await user.save();
 
       // Create transaction record
       const transaction = new Transaction({
         userId: user._id,
         type: 'deposit',
-        amount: deposit.amount,
+        amount: usdtAmount, // Store USDT amount in transaction
         status: 'completed'
       });
       await transaction.save();

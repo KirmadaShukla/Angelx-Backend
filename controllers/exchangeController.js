@@ -308,6 +308,76 @@ const getExchangeHistory = catchAsyncError(async (req, res, next) => {
   });
 });
 
+// @desc    Update exchange status (admin)
+// @access  Private (Admin)
+const updateExchangeStatus = catchAsyncError(async (req, res, next) => {
+  const { status } = req.body;
+  const validStatuses = ['pending', 'completed', 'failed'];
+  
+  if (!validStatuses.includes(status)) {
+    return next(new ErrorHandler('Invalid status', 400));
+  }
+
+  const exchange = await Exchange.findById(req.params.id)
+    .populate('userId', 'phone balance');
+
+  if (!exchange) {
+    return next(new ErrorHandler('Exchange not found', 404));
+  }
+
+  const oldStatus = exchange.status;
+  exchange.status = status;
+
+  // In a real implementation, this is where you would process the actual
+  // bank transfer to send INR to the user's bank account
+  // For now, we're just updating the status
+
+  await exchange.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Exchange status updated successfully',
+    data: {
+      exchange,
+      oldStatus,
+      newStatus: status
+    }
+  });
+});
+
+// @desc    Get all exchanges (admin)
+// @access  Private (Admin)
+const getAllExchanges = catchAsyncError(async (req, res, next) => {
+  const { page = 1, limit = 20, status, userId } = req.query;
+  
+  const query = {};
+  if (status) query.status = status;
+  if (userId) query.userId = userId;
+
+  const exchanges = await Exchange.find(query)
+    .populate('userId', 'phone')
+    .populate('methodId', 'bankName accountNo ifscCode')
+    .sort({ createdAt: -1 })
+    .limit(limit * 1)
+    .skip((page - 1) * limit)
+    .select('-__v');
+
+  const total = await Exchange.countDocuments(query);
+  const totalPages = Math.ceil(total / limit);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      exchanges,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages,
+        totalRecords: total
+      }
+    }
+  });
+});
+
 module.exports = {
   getCurrentRate,
   updateRate,
@@ -316,5 +386,7 @@ module.exports = {
   addExchangeMethod,
   deleteExchangeMethod,
   createExchange,
-  getExchangeHistory
+  getExchangeHistory,
+  updateExchangeStatus,
+  getAllExchanges
 };

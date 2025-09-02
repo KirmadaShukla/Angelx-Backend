@@ -7,10 +7,12 @@ const {
   addExchangeMethod, 
   deleteExchangeMethod,
   createExchange,
-  getExchangeHistory
+  getExchangeHistory,
+  updateExchangeStatus,
+  getAllExchanges
 } = require('../controllers/exchangeController');
 const { authenticateUser, authenticateAdmin } = require('../middleware/auth');
-const { validateAmount, validateObjectId, validatePagination } = require('../middleware/validation');
+const { validateUsdtAmount, validateObjectId, validatePagination } = require('../middleware/validation');
 
 const router = express.Router();
 
@@ -47,11 +49,23 @@ router.delete('/methods/:id', authenticateUser, validateObjectId('id'), deleteEx
 // @route   POST /api/exchange/create
 // @desc    Create new exchange (USDT to INR)
 // @access  Private
-router.post('/create', authenticateUser, validateAmount, createExchange);
+router.post('/create', authenticateUser, validateUsdtAmount, createExchange);
 
 // @route   GET /api/exchange/history
 // @desc    Get user's exchange history
 // @access  Private
 router.get('/history', authenticateUser, validatePagination, getExchangeHistory);
+
+// Admin routes for exchange management
+
+// @route   GET /api/exchange/admin/all
+// @desc    Get all exchanges (admin)
+// @access  Private (Admin)
+router.get('/admin/all', authenticateAdmin, getAllExchanges);
+
+// @route   PUT /api/exchange/admin/update-status/:id
+// @desc    Update exchange status (admin)
+// @access  Private (Admin)
+router.put('/admin/update-status/:id', authenticateAdmin, validateObjectId('id'), updateExchangeStatus);
 
 module.exports = router;

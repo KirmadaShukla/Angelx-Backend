@@ -6,7 +6,9 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "seed": "node seed.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "echo \"Documentation available in README.md, API_DOCUMENTATION.md, and FLOW_SUMMARY.md\"",
+    "test:flow": "cd tests && ./final_transaction_flow_test.sh"
   },
   "keywords": [
     "cryptocurrency",
