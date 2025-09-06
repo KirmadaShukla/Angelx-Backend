@@ -206,7 +206,6 @@ const deleteExchangeMethod = catchAsyncError(async (req, res, next) => {
 // @access  Private
 const createExchange = catchAsyncError(async (req, res, next) => {
   const { methodId, usdtAmount } = req.body;
-  
   // Validation
   if (!methodId || !usdtAmount || usdtAmount <= 0) {
     return next(new ErrorHandler('Method ID and valid USDT amount are required', 400));
@@ -234,7 +233,7 @@ const createExchange = catchAsyncError(async (req, res, next) => {
 
   // Check user balance
   const user = await User.findById(req.user._id);
-  
+
   if (user.balance < usdtAmount) {
     return next(new ErrorHandler('Insufficient USDT balance', 400));
   }
@@ -280,10 +279,16 @@ const createExchange = catchAsyncError(async (req, res, next) => {
 const getExchangeHistory = catchAsyncError(async (req, res, next) => {
   const { page = 1, limit = 10, status } = req.query;
   
+  // Log for debugging
+  console.log('Exchange history request for user:', req.user._id);
+  console.log('Query parameters:', { page, limit, status });
+  
   const query = { userId: req.user._id };
   if (status) {
     query.status = status;
   }
+  
+  console.log('Database query:', JSON.stringify(query));
 
   const exchanges = await Exchange.find(query)
     .populate('methodId', 'bankName accountNo')
@@ -294,6 +299,8 @@ const getExchangeHistory = catchAsyncError(async (req, res, next) => {
 
   const total = await Exchange.countDocuments(query);
   const totalPages = Math.ceil(total / limit);
+  
+  console.log(`Found ${exchanges.length} exchanges out of ${total} total`);
 
   res.status(200).json({
     success: true,

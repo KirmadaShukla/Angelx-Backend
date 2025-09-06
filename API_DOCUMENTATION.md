@@ -217,9 +217,9 @@ This document provides detailed information about all API endpoints available in
         {
           "_id": "68b732e2376045ba9a16c438",
           "userId": "68b732d8376045ba9a16c434",
-          "method": "USDT",
+          "currency": "USDT",
           "walletAddress": "0xNewUserWalletAddress123456789",
-          "network": "TRC20",
+          "network": "TRC20-USDT",
           "createdAt": "2025-09-02T18:09:38.424Z",
           "updatedAt": "2025-09-02T18:09:38.424Z"
         }
@@ -238,9 +238,8 @@ This document provides detailed information about all API endpoints available in
 - **Body**:
   ```json
   {
-    "method": "USDT",
-    "walletAddress": "0xNewUserWalletAddress123456789",
-    "network": "TRC20"
+    "currency": "USDT",
+    "walletAddress": "0xNewUserWalletAddress123456789"
   }
   ```
 - **Success Response**:
@@ -252,9 +251,9 @@ This document provides detailed information about all API endpoints available in
       "wallet": {
         "_id": "68b732e2376045ba9a16c438",
         "userId": "68b732d8376045ba9a16c434",
-        "method": "USDT",
+        "currency": "USDT",
         "walletAddress": "0xNewUserWalletAddress123456789",
-        "network": "TRC20",
+        "network": "TRC20-USDT",
         "createdAt": "2025-09-02T18:09:38.424Z",
         "updatedAt": "2025-09-02T18:09:38.424Z"
       }

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AngelX Cryptocurrency Exchange Platform - Business Flow Documentation</title>
+    <style>
+        body {
+            font-family: Calibri, sans-serif;
+            line-height: 1.6;
+            margin: 40px;
+        }
+        h1 {
+            color: #2E74B5;
+            font-size: 24pt;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #2E74B5;
+            font-size: 20pt;
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+        h3 {
+            color: #2E74B5;
+            font-size: 16pt;
+            margin-top: 14px;
+            margin-bottom: 6px;
+        }
+        p {
+            font-size: 11pt;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        ul {
+            margin-top: 0;
+            margin-bottom: 10px;
+            padding-left: 30px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        .toc {
+            margin-bottom: 30px;
+        }
+        .toc-item {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>AngelX Cryptocurrency Exchange Platform - Business Flow Documentation</h1>
+    
+    <p>This document provides a clear overview of how the AngelX platform works from a business perspective, explaining the processes and flows without technical implementation details.</p>
+    
+    <div class="toc">
+        <h1>Table of Contents</h1>
+        <div class="toc-item">1. <a href="#platform-overview">Platform Overview</a></div>
+        <div class="toc-item">2. <a href="#user-roles">User Roles</a></div>
+        <div class="toc-item">3. <a href="#core-features">Core Features</a></div>
+        <div class="toc-item">4. <a href="#transaction-flows">Transaction Flows</a></div>
+        <div class="toc-item" style="margin-left: 20px;">4.1 <a href="#user-registration">User Registration & Authentication</a></div>
+        <div class="toc-item" style="margin-left: 20px;">4.2 <a href="#deposit-process">Deposit Process</a></div>
+        <div class="toc-item" style="margin-left: 20px;">4.3 <a href="#withdrawal-process">Withdrawal Process</a></div>
+        <div class="toc-item" style="margin-left: 20px;">4.4 <a href="#exchange-process">Exchange Process</a></div>
+        <div class="toc-item">5. <a href="#balance-management">Balance Management</a></div>
+        <div class="toc-item">6. <a href="#administrative-functions">Administrative Functions</a></div>
+    </div>
+    
+    <h1 id="platform-overview">Platform Overview</h1>
+    
+    <p>AngelX is a secure cryptocurrency exchange platform that enables users to:</p>
+    <ul>
+        <li>Deposit fiat currency (INR) to receive cryptocurrency (USDT)</li>
+        <li>Withdraw cryptocurrency (USDT) to personal wallets</li>
+        <li>Exchange cryptocurrency (USDT) for fiat currency (INR)</li>
+        <li>Track all transactions and account balances</li>
+    </ul>
+    
+    <p>The platform operates on a dual-role system with distinct permissions for regular users and administrators.</p>
+    
+    <h1 id="user-roles">User Roles</h1>
+    
+    <h2>Regular Users</h2>
+    
+    <p>Regular users can:</p>
+    <ul>
+        <li>Register and log in to the platform</li>
+        <li>Deposit INR to receive USDT</li>
+        <li>Withdraw USDT to external wallets</li>
+        <li>Exchange USDT for INR</li>
+        <li>Manage wallet addresses and bank accounts</li>
+        <li>View transaction history and account balance</li>
+    </ul>
+    
+    <h2>Administrators</h2>
+    
+    <p>Administrators can:</p>
+    <ul>
+        <li>Manage user accounts and balances</li>
+        <li>Create and update deposit methods</li>
+        <li>Set and update exchange rates</li>
+        <li>Verify and approve deposit transactions</li>
+        <li>Process withdrawal requests</li>
+        <li>Handle exchange transactions</li>
+        <li>View platform analytics and statistics</li>
+    </ul>
+    
+    <h1 id="core-features">Core Features</h1>
+    
+    <h2>1. Deposit Management</h2>
+    <p>Users can deposit fiat currency (INR) which gets converted to cryptocurrency (USDT) based on the current exchange rate.</p>
+    
+    <h2>2. Withdrawal Management</h2>
+    <p>Users can withdraw their USDT balance to external cryptocurrency wallets.</p>
+    
+    <h2>3. Exchange Services</h2>
+    <p>Users can exchange their USDT balance for fiat currency (INR) which gets transferred to their bank accounts.</p>
+    
+    <h2>4. Wallet Management</h2>
+    <p>Users can save and manage multiple cryptocurrency wallet addresses.</p>
+    
+    <h2>5. Bank Account Management</h2>
+    <p>Users can save and manage multiple bank accounts for receiving fiat currency.</p>
+    
+    <h2>6. Transaction History</h2>
+    <p>Users can view their complete transaction history including deposits, withdrawals, and exchanges.</p>
+    
+    <h1 id="transaction-flows">Transaction Flows</h1>
+    
+    <h2 id="user-registration">User Registration & Authentication</h2>
+    
+    <h3>User Registration Process:</h3>
+    <ol>
+        <li>User provides a 10-digit phone number</li>
+        <li>System sends an OTP for verification</li>
+        <li>User verifies the OTP</li>
+        <li>System creates the account</li>
+    </ol>
+    
+    <h3>Authentication Process:</h3>
+    <ol>
+        <li>User provides their phone number</li>
+        <li>System sends an OTP</li>
+        <li>User provides the OTP</li>
+        <li>System authenticates the user and grants access</li>
+    </ol>
+    
+    <h2 id="deposit-process">Deposit Process</h2>
+    
+    <p>The deposit process allows users to add funds to their account by depositing fiat currency (INR).</p>
+    
+    <h3>Step-by-Step Flow:</h3>
+    
+    <p><strong>1. View Deposit Methods</strong></p>
+    <ul>
+        <li>User can see all available payment methods for deposits</li>
+    </ul>
+    
+    <p><strong>2. Create Deposit Request</strong></p>
+    <ul>
+        <li>User selects a payment method and specifies INR amount to deposit</li>
+        <li>System creates a deposit request and provides payment details</li>
+    </ul>
+    
+    <p><strong>3. Make Payment</strong></p>
+    <ul>
+        <li>User makes payment using the provided method details</li>
+        <li>User obtains a transaction ID (TXID) from the payment platform</li>
+    </ul>
+    
+    <p><strong>4. Submit Transaction ID</strong></p>
+    <ul>
+        <li>User submits the transaction ID to the system</li>
+        <li>System marks the deposit as awaiting verification</li>
+    </ul>
+    
+    <p><strong>5. Admin Verification</strong></p>
+    <ul>
+        <li>Admin reviews the pending deposit</li>
+        <li>Admin verifies the transaction by checking payment details</li>
+        <li>Admin approves or rejects the deposit</li>
+    </ul>
+    
+    <p><strong>6. Balance Crediting</strong></p>
+    <ul>
+        <li>If approved, system converts INR to USDT using the current exchange rate</li>
+        <li>System adds the USDT equivalent to the user's balance</li>
+    </ul>
+    
+    <h3>Key Points:</h3>
+    <ul>
+        <li>Users deposit fiat currency (INR) and receive cryptocurrency (USDT)</li>
+        <li>Balance is credited only after admin approval with proper conversion</li>
+        <li>Transaction IDs are required for verification</li>
+        <li>Deposit methods are managed by admins</li>
+    </ul>
+    
+    <h2 id="withdrawal-process">Withdrawal Process</h2>
+    
+    <p>The withdrawal process allows users to transfer cryptocurrency from their account to external wallets.</p>
+    
+    <h3>Step-by-Step Flow:</h3>
+    
+    <p><strong>1. Manage Wallets</strong></p>
+    <ul>
+        <li>User can add and save wallet addresses</li>
+        <li>User can view their saved wallet addresses</li>
+    </ul>
+    
+    <p><strong>2. Create Withdrawal Request</strong></p>
+    <ul>
+        <li>User selects a wallet and specifies USDT amount to withdraw</li>
+        <li>User confirms the request with an OTP</li>
+        <li>System immediately deducts USDT amount from user balance</li>
+        <li>System creates a withdrawal request for admin processing</li>
+    </ul>
+    
+    <p><strong>3. Admin Processing</strong></p>
+    <ul>
+        <li>Admin reviews the withdrawal request</li>
+        <li>Admin processes the withdrawal by sending cryptocurrency to user's wallet</li>
+        <li>Admin marks the withdrawal as completed</li>
+        <li>System creates a transaction record for audit purposes</li>
+    </ul>
+    
+    <h3>Key Points:</h3>
+    <ul>
+        <li>Balance is deducted immediately when withdrawal is created</li>
+        <li>Status changes don't affect balance (balance already deducted)</li>
+        <li>Transaction records are for audit purposes only</li>
+    </ul>
+    
+    <h2 id="exchange-process">Exchange Process</h2>
+    
+    <p>The exchange process allows users to convert cryptocurrency to fiat currency.</p>
+    
+    <h3>Step-by-Step Flow:</h3>
+    
+    <p><strong>1. Manage Bank Accounts</strong></p>
+    <ul>
+        <li>User can add and save bank account details</li>
+        <li>User can view their saved bank accounts</li>
+    </ul>
+    
+    <p><strong>2. Check Exchange Rate</strong></p>
+    <ul>
+        <li>User can check the current exchange rate</li>
+        <li>Admins can update rates as needed</li>
+    </ul>
+    
+    <p><strong>3. Create Exchange Request</strong></p>
+    <ul>
+        <li>User selects a bank account and specifies USDT amount to exchange</li>
+        <li>System immediately deducts USDT from user balance</li>
+        <li>System creates an exchange request with INR equivalent</li>
+    </ul>
+    
+    <p><strong>4. Admin Processing</strong></p>
+    <ul>
+        <li>Admin reviews the exchange request</li>
+        <li>Admin processes the exchange by transferring INR to user's bank account</li>
+        <li>Admin marks the exchange as completed</li>
+        <li>User receives fiat currency in their bank account</li>
+    </ul>
+    
+    <h3>Key Points:</h3>
+    <ul>
+        <li>Exchange rate is used to calculate INR equivalent</li>
+        <li>USDT balance is deducted immediately upon request</li>
+        <li>Fiat transfer is processed manually by admin</li>
+    </ul>
+    
+    <h1 id="balance-management">Balance Management</h1>
+    
+    <h2>Currency System</h2>
+    <ul>
+        <li>All user balances are stored in USDT (Tether cryptocurrency)</li>
+        <li>Deposits in INR are converted to USDT using the exchange rate</li>
+        <li>Withdrawals and exchanges use USDT balance directly</li>
+    </ul>
+    
+    <h2>Balance Update Logic</h2>
+    
+    <h3>Deposit Approval:</h3>
+    <ol>
+        <li>Admin approves deposit</li>
+        <li>System converts INR amount to USDT using current exchange rate</li>
+        <li>System adds USDT equivalent to user balance</li>
+    </ol>
+    
+    <h3>Withdrawal Creation:</h3>
+    <ol>
+        <li>User creates withdrawal request</li>
+        <li>System immediately deducts USDT amount from user balance</li>
+        <li>Status changes do not affect balance (already deducted)</li>
+    </ol>
+    
+    <h3>Exchange Creation:</h3>
+    <ol>
+        <li>User creates exchange request</li>
+        <li>System immediately deducts USDT amount from user balance</li>
+        <li>Status changes do not affect balance (already deducted)</li>
+    </ol>
+    
+    <h2>Important Balance Principles:</h2>
+    <ol>
+        <li><strong>Deposit</strong>: Balance credited only after admin approval</li>
+        <li><strong>Withdrawal</strong>: Balance deducted immediately upon request creation</li>
+        <li><strong>Exchange</strong>: USDT deducted immediately upon request creation</li>
+        <li><strong>Transaction Records</strong>: Audit trail only, no balance impact</li>
+    </ol>
+    
+    <h1 id="administrative-functions">Administrative Functions</h1>
+    
+    <h2>User Management</h2>
+    <ul>
+        <li>View all users and their account details</li>
+        <li>Update user balances manually when needed</li>
+        <li>Monitor user activity and transaction history</li>
+    </ul>
+    
+    <h2>Deposit Method Management</h2>
+    <ul>
+        <li>Create new deposit methods (bank accounts, payment gateways)</li>
+        <li>Activate or deactivate existing deposit methods</li>
+        <li>Update deposit method details</li>
+    </ul>
+    
+    <h2>Exchange Rate Management</h2>
+    <ul>
+        <li>Set and update the INR to USDT exchange rate</li>
+        <li>Track rate change history</li>
+    </ul>
+    
+    <h2>Transaction Verification</h2>
+    <ul>
+        <li>Review pending deposit requests</li>
+        <li>Verify transaction IDs and payment details</li>
+        <li>Approve or reject deposit requests</li>
+        <li>Process withdrawal and exchange requests</li>
+    </ul>
+    
+    <h2>Platform Analytics</h2>
+    <ul>
+        <li>View dashboard with key metrics</li>
+        <li>Monitor transaction volumes</li>
+        <li>Track user registration trends</li>
+    </ul>
+    
+    <p>This documentation provides a complete business overview of the AngelX platform functionality without technical implementation details.</p>
+</body>
+</html>

@@ -38,10 +38,10 @@ router.put('/:id', authenticateUser, validateObjectId('id'), updateWallet);
 // @access  Private
 router.get('/:id', authenticateUser, validateObjectId('id'), getWalletById);
 
-// @route   GET /api/wallet/methods/summary
-// @desc    Get summary of wallets by method
+// @route   GET /api/wallet/currencies/summary
+// @desc    Get summary of wallets by currency
 // @access  Private
-router.get('/methods/summary', authenticateUser, getWalletSummary);
+router.get('/currencies/summary', authenticateUser, getWalletSummary);
 
 // @route   POST /api/wallet/validate
 // @desc    Validate wallet address format

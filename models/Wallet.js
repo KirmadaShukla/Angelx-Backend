@@ -6,7 +6,7 @@ const walletSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  method: {
+  currency: {
     type: String,
     enum: ['USDT', 'PAYX'],
     required: true
@@ -15,6 +15,10 @@ const walletSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true
+  },
+  network: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true
@@ -22,6 +26,6 @@ const walletSchema = new mongoose.Schema({
 
 // Index for user queries
 walletSchema.index({ userId: 1 });
-walletSchema.index({ userId: 1, method: 1 });
+walletSchema.index({ userId: 1, currency: 1 });
 
 module.exports = mongoose.model('Wallet', walletSchema);

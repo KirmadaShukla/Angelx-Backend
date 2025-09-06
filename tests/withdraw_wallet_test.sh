@@ -112,7 +112,7 @@ echo
 # Add a new wallet
 echo "2.2 Add New Wallet"
 timestamp=$(date +%s)
-wallet_data="{\"method\":\"USDT\",\"walletAddress\":\"0xWalletAddress$timestamp\",\"network\":\"ERC20\"}"
+wallet_data="{\"currency\":\"USDT\",\"walletAddress\":\"0xWalletAddress$timestamp\"}"
 response=$(curl -s -X POST $BASE_URL/wallet/add \
   -H "Authorization: Bearer $USER_TOKEN" \
   -H "Content-Type: application/json" \
@@ -149,10 +149,12 @@ if [ -n "$new_wallet_id" ]; then
       -H "Authorization: Bearer $USER_TOKEN")
     if echo "$response" | grep -q "success.*true"; then
         echo -e "   ${GREEN}✅ Get wallet details successful${NC}"
-        wallet_method=$(echo "$response" | grep -o '"method":"[^"]*"' | cut -d'"' -f4)
+        wallet_currency=$(echo "$response" | grep -o '"currency":"[^"]*"' | cut -d'"' -f4)
         wallet_address=$(echo "$response" | grep -o '"walletAddress":"[^"]*"' | cut -d'"' -f4)
-        echo "   Wallet method: $wallet_method"
+        wallet_network=$(echo "$response" | grep -o '"network":"[^"]*"' | cut -d'"' -f4)
+        echo "   Wallet currency: $wallet_currency"
         echo "   Wallet address: $wallet_address"
+        echo "   Wallet network: $wallet_network"
     else
         echo -e "   ${RED}❌ Get wallet details failed${NC}"
         echo "   Response: $response"
@@ -166,7 +168,7 @@ echo
 # Update wallet
 if [ -n "$new_wallet_id" ]; then
     echo "2.5 Update Wallet"
-    updated_wallet_data="{\"walletAddress\":\"0xUpdatedWalletAddress$timestamp\",\"network\":\"TRC20\"}"
+    updated_wallet_data="{\"walletAddress\":\"0xUpdatedWalletAddress$timestamp\",\"currency\":\"PAYX\"}"
     response=$(curl -s -X PUT $BASE_URL/wallet/$new_wallet_id \
       -H "Authorization: Bearer $USER_TOKEN" \
       -H "Content-Type: application/json" \
@@ -174,8 +176,10 @@ if [ -n "$new_wallet_id" ]; then
     if echo "$response" | grep -q "success.*true"; then
         echo -e "   ${GREEN}✅ Update wallet successful${NC}"
         updated_address=$(echo "$response" | grep -o '"walletAddress":"[^"]*"' | cut -d'"' -f4)
+        updated_currency=$(echo "$response" | grep -o '"currency":"[^"]*"' | cut -d'"' -f4)
         updated_network=$(echo "$response" | grep -o '"network":"[^"]*"' | cut -d'"' -f4)
         echo "   Updated address: $updated_address"
+        echo "   Updated currency: $updated_currency"
         echo "   Updated network: $updated_network"
     else
         echo -e "   ${RED}❌ Update wallet failed${NC}"

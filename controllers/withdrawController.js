@@ -42,7 +42,7 @@ const createWithdrawal = catchAsyncError(async (req, res, next) => {
   const withdrawal = new Withdraw({
     userId: req.user._id,
     walletId,
-    method: wallet.method,
+    method: wallet.currency, // Changed from wallet.method to wallet.currency
     walletAddress: wallet.walletAddress,
     amount,
     status: 'pending'
@@ -83,7 +83,7 @@ const getWithdrawalHistory = catchAsyncError(async (req, res, next) => {
   }
 
   const withdrawals = await Withdraw.find(query)
-    .populate('walletId', 'method walletAddress')
+    .populate('walletId', 'currency walletAddress') // Changed from 'method walletAddress' to 'currency walletAddress'
     .sort({ createdAt: -1 })
     .limit(limit * 1)
     .skip((page - 1) * limit)
@@ -111,7 +111,7 @@ const getWithdrawalById = catchAsyncError(async (req, res, next) => {
   const withdrawal = await Withdraw.findOne({
     _id: req.params.id,
     userId: req.user._id
-  }).populate('walletId', 'method walletAddress');
+  }).populate('walletId', 'currency walletAddress'); // Changed from 'method walletAddress' to 'currency walletAddress'
 
   if (!withdrawal) {
     return next(new ErrorHandler('Withdrawal not found', 404));

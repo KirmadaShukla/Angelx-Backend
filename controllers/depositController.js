@@ -279,26 +279,21 @@ const updateDepositStatus = catchAsyncError(async (req, res, next) => {
   const oldStatus = deposit.status;
   deposit.status = status;
 
-  // If deposit is completed, convert INR to USDT and add to user balance
+  let updatedUserBalance = null;
+
+  // If deposit is completed, add USDT amount directly to user balance (no conversion needed)
   if (status === 'completed' && oldStatus !== 'completed') {
     const user = await User.findById(deposit.userId._id);
     if (user) {
-      // Get current exchange rate
-      let rateDoc = await ExchangeRate.findOne().sort({ createdAt: -1 });
-      
-      if (!rateDoc) {
-        return next(new ErrorHandler('Exchange rate not available', 500));
-      }
+      // Since we're depositing USDT directly, use the deposit amount as-is
+      const usdtAmount = deposit.amount;
 
-      const exchangeRate = rateDoc.dollarRate;
-      
-      // Convert INR deposit amount to USDT
-      // Formula: USDT = INR / exchangeRate
-      const usdtAmount = deposit.amount / exchangeRate;
-      
-      // Add USDT equivalent to user balance
+      // Add USDT amount to user balance
       user.balance += usdtAmount;
       await user.save();
+      
+      // Store the updated balance to return in response
+      updatedUserBalance = user.balance;
 
       // Create transaction record
       const transaction = new Transaction({
@@ -313,7 +308,7 @@ const updateDepositStatus = catchAsyncError(async (req, res, next) => {
 
   await deposit.save();
 
-  res.status(200).json({
+  const responseData = {
     success: true,
     message: 'Deposit status updated successfully',
     data: {
@@ -321,7 +316,14 @@ const updateDepositStatus = catchAsyncError(async (req, res, next) => {
       oldStatus,
       newStatus: status
     }
-  });
+  };
+  
+  // Include updated user balance in response if deposit was completed
+  if (status === 'completed' && oldStatus !== 'completed' && updatedUserBalance !== null) {
+    responseData.data.updatedUserBalance = updatedUserBalance;
+  }
+
+  res.status(200).json(responseData);
 });
 
 module.exports = {
