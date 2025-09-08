@@ -149,7 +149,7 @@ const addExchangeMethod = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler('Account number is too short', 400));
   }
 
-  if (ifscCode.length < 5) {
+  if (ifscCode.length < 11) {
     return next(new ErrorHandler('IFSC code is too short', 400));
   }
 

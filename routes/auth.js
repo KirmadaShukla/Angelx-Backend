@@ -1,13 +1,12 @@
 const express = require('express');
 const { login, verifyOtp, logout } = require('../controllers/authController');
-const { validatePhoneNumber } = require('../middleware/validation');
 
 const router = express.Router();
 
 // @route   POST /api/auth/login
 // @desc    Send phone number for OTP verification
 // @access  Public
-router.post('/login', validatePhoneNumber, login);
+router.post('/send-otp', login);
 
 // @route   POST /api/auth/verify-otp
 // @desc    Verify OTP and login/register user

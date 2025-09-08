@@ -3,16 +3,6 @@ const mongoose = require('mongoose');
 const catchAsyncError = require('../utils/catchAsyncError');
 const { ErrorHandler } = require('../utils/ErrorHandler');
 
-const validatePhoneNumber = catchAsyncError(async (req, res, next) => {
-  const { phone } = req.body;
-  
-  if (!phone || !/^\d{10}$/.test(phone.toString().trim())) {
-    return next(new ErrorHandler('Phone number must be exactly 10 digits', 400));
-  }
-  
-  req.body.phone = phone.toString().trim();
-  next();
-});
 
 const validateAmount = catchAsyncError(async (req, res, next) => {
   const { amount } = req.body;
@@ -63,7 +53,7 @@ const validatePagination = catchAsyncError(async (req, res, next) => {
 });
 
 module.exports = {
-  validatePhoneNumber,
+  
   validateAmount,
   validateUsdtAmount,
   validateObjectId,
