@@ -385,6 +385,23 @@ const getAllExchanges = catchAsyncError(async (req, res, next) => {
   });
 });
 
+// @desc    Get user's current balance
+// @access  Private
+const getCurrentBalance = catchAsyncError(async (req, res, next) => {
+  const user = await User.findById(req.user._id).select('balance');
+  
+  if (!user) {
+    return next(new ErrorHandler('User not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: {
+      balance: user.balance
+    }
+  });
+});
+
 module.exports = {
   getCurrentRate,
   updateRate,
@@ -395,5 +412,6 @@ module.exports = {
   createExchange,
   getExchangeHistory,
   updateExchangeStatus,
-  getAllExchanges
+  getAllExchanges,
+  getCurrentBalance
 };

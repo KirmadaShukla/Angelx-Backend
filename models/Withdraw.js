@@ -6,6 +6,11 @@ const withdrawSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  walletId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Wallet',
+    required: true
+  },
   method: {
     type: String,
     enum: ['USDT', 'PAYX'],

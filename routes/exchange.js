@@ -9,12 +9,18 @@ const {
   createExchange,
   getExchangeHistory,
   updateExchangeStatus,
-  getAllExchanges
+  getAllExchanges,
+  getCurrentBalance
 } = require('../controllers/exchangeController');
 const { authenticateUser, authenticateAdmin } = require('../middleware/auth');
 const { validateUsdtAmount, validateObjectId, validatePagination } = require('../middleware/validation');
 
 const router = express.Router();
+
+// @route   GET /api/exchange/balance
+// @desc    Get user's current balance
+// @access  Private
+router.get('/balance', authenticateUser, getCurrentBalance);
 
 // @route   GET /api/exchange/rate
 // @desc    Get current exchange rate

@@ -33,11 +33,6 @@ const addWallet = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler('Invalid currency. Must be USDT or PAYX', 400));
   }
 
-  // Validate address format (basic validation)
-  if (walletAddress.length < 20) {
-    return next(new ErrorHandler('Invalid wallet address', 400));
-  }
-
   // Check if wallet already exists for this user
   const existingWallet = await Wallet.findOne({
     userId: req.user._id,

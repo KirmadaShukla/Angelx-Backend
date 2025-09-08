@@ -8,10 +8,10 @@ const { ErrorHandler } = require('../utils/ErrorHandler');
 // @desc    Create new withdrawal request
 // @access  Private
 const createWithdrawal = catchAsyncError(async (req, res, next) => {
-  const { walletId, amount, otp } = req.body;
-  
+  const { walletId, amount } = req.body;
+
   // Validation
-  if (!walletId || !amount || amount <= 0 || !otp) {
+  if (!walletId || !amount || amount <= 0) {
     return next(new ErrorHandler('Wallet ID, valid amount, and OTP are required', 400));
   }
 
@@ -25,15 +25,9 @@ const createWithdrawal = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler('Wallet not found', 404));
   }
 
-  // In real implementation, verify OTP
-  // For now, accept any 6-digit OTP for testing
-  if (!/^\d{6}$/.test(otp)) {
-    return next(new ErrorHandler('Invalid OTP format', 400));
-  }
-
   // Check user balance
   const user = await User.findById(req.user._id);
-  
+
   if (user.balance < amount) {
     return next(new ErrorHandler('Insufficient balance', 400));
   }
@@ -50,9 +44,7 @@ const createWithdrawal = catchAsyncError(async (req, res, next) => {
 
   await withdrawal.save();
 
-  // Deduct balance only after successful creation
-  user.balance -= amount;
-  await user.save();
+
 
   res.status(201).json({
     success: true,
@@ -76,7 +68,7 @@ const createWithdrawal = catchAsyncError(async (req, res, next) => {
 // @access  Private
 const getWithdrawalHistory = catchAsyncError(async (req, res, next) => {
   const { page = 1, limit = 10, status } = req.query;
-  
+
   const query = { userId: req.user._id };
   if (status) {
     query.status = status;
@@ -186,7 +178,7 @@ const getWithdrawalStats = catchAsyncError(async (req, res, next) => {
 // @access  Private (Admin)
 const getAllWithdrawals = catchAsyncError(async (req, res, next) => {
   const { page = 1, limit = 20, status, userId } = req.query;
-  
+
   const query = {};
   if (status) query.status = status;
   if (userId) query.userId = userId;
@@ -219,7 +211,7 @@ const getAllWithdrawals = catchAsyncError(async (req, res, next) => {
 const updateWithdrawalStatus = catchAsyncError(async (req, res, next) => {
   const { status } = req.body;
   const validStatuses = ['pending', 'approved', 'rejected'];
-  
+
   if (!validStatuses.includes(status)) {
     return next(new ErrorHandler('Invalid status', 400));
   }
@@ -254,6 +246,10 @@ const updateWithdrawalStatus = catchAsyncError(async (req, res, next) => {
 
   // If withdrawal is approved, create transaction record
   if (status === 'approved' && oldStatus === 'pending') {
+    // Deduct balance only after successful creation
+    const user = await User.findById(withdrawal.userId._id);
+    user.balance -= amount;
+    await user.save();
     const transaction = new Transaction({
       userId: withdrawal.userId._id,
       type: 'withdrawal',
@@ -280,7 +276,7 @@ const updateWithdrawalStatus = catchAsyncError(async (req, res, next) => {
 // @access  Private (Admin)
 const getAdminWithdrawalStats = catchAsyncError(async (req, res, next) => {
   const totalWithdrawals = await Withdraw.countDocuments();
-  
+
   const totalAmount = await Withdraw.aggregate([
     { $group: { _id: null, total: { $sum: '$amount' } } }
   ]);
