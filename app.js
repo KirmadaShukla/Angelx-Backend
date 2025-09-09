@@ -24,7 +24,7 @@ const { generatedErrors } = require('./middleware/error');
 
 // Middleware
 app.use(cors({
-  origin: true,
+  origin: ['https://angelx-mirror-clone.vercel.app','http://localhost:8030'],
   credentials: true
 }));
 app.use(bodyParser.json());
