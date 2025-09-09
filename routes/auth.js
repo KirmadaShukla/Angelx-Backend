@@ -1,5 +1,6 @@
 const express = require('express');
-const { login, verifyOtp, logout } = require('../controllers/authController');
+const { login, verifyOtp, logout, updateTransactionPassword } = require('../controllers/authController');
+const { authenticateUser } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -17,5 +18,10 @@ router.post('/verify-otp', verifyOtp);
 // @desc    Logout user
 // @access  Private
 router.post('/logout', logout);
+
+// @route   PUT /api/auth/transaction-password
+// @desc    Update transaction password
+// @access  Private
+router.put('/transaction-password', authenticateUser, updateTransactionPassword);
 
 module.exports = router;

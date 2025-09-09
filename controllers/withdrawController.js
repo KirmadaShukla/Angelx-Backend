@@ -8,11 +8,16 @@ const { ErrorHandler } = require('../utils/ErrorHandler');
 // @desc    Create new withdrawal request
 // @access  Private
 const createWithdrawal = catchAsyncError(async (req, res, next) => {
-  const { walletId, amount } = req.body;
+  const { walletId, amount, transactionPassword } = req.body;
 
   // Validation
   if (!walletId || !amount || amount <= 0) {
-    return next(new ErrorHandler('Wallet ID, valid amount, and OTP are required', 400));
+    return next(new ErrorHandler('Wallet ID and valid amount are required', 400));
+  }
+
+  // Check if transaction password is provided
+  if (!transactionPassword) {
+    return next(new ErrorHandler('Transaction password is required', 400));
   }
 
   // Check if wallet exists and belongs to user
@@ -26,10 +31,16 @@ const createWithdrawal = catchAsyncError(async (req, res, next) => {
   }
 
   // Check user balance
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user._id).select('+transactionPassword');
 
   if (user.balance < amount) {
     return next(new ErrorHandler('Insufficient balance', 400));
+  }
+
+  // Verify transaction password
+  const isPasswordValid = await user.compareTransactionPassword(transactionPassword);
+  if (!isPasswordValid) {
+    return next(new ErrorHandler('Invalid transaction password', 400));
   }
 
   // Create withdrawal record first

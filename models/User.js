@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   phone: {
@@ -18,6 +19,12 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
     min: 0
+  },
+  transactionPassword: {
+    type: String,
+    minlength: 6,
+    maxlength: 6,
+    select: false // Don't include in queries by default
   }
 }, {
   timestamps: true
@@ -29,6 +36,25 @@ userSchema.methods.getJwtToken = function() {
     expiresIn: process.env.JWT_EXPIRE || '30d'
   });
 };
+
+// Compare transaction password
+userSchema.methods.compareTransactionPassword = async function(enteredPassword) {
+  if (!this.transactionPassword) {
+    return false;
+  }
+  return await bcrypt.compare(enteredPassword, this.transactionPassword);
+};
+
+// Hash transaction password before saving
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('transactionPassword')) {
+    next();
+  }
+  
+  if (this.transactionPassword) {
+    this.transactionPassword = await bcrypt.hash(this.transactionPassword, 12);
+  }
+});
 
 // Index for phone number
 userSchema.index({ phone: 1 });

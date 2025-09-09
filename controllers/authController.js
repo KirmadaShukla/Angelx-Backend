@@ -75,8 +75,35 @@ const logout = catchAsyncError(async (req, res, next) => {
   });
 });
 
+// @desc    Update transaction password
+// @access  Private
+const updateTransactionPassword = catchAsyncError(async (req, res, next) => {
+  const { transactionPassword } = req.body;
+
+  // Validate transaction password
+  if (!transactionPassword || transactionPassword.length !== 6 || !/^\d{6}$/.test(transactionPassword)) {
+    return next(new ErrorHandler('Transaction password must be exactly 6 digits', 400));
+  }
+
+  // Update user's transaction password
+  const user = await User.findById(req.user._id);
+  
+  if (!user) {
+    return next(new ErrorHandler('User not found', 404));
+  }
+
+  user.transactionPassword = transactionPassword;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Transaction password updated successfully'
+  });
+});
+
 module.exports = {
   login,
   verifyOtp,
-  logout
+  logout,
+  updateTransactionPassword
 };
