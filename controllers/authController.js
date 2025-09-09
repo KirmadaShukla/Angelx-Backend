@@ -7,10 +7,10 @@ const { ErrorHandler } = require('../utils/ErrorHandler');
 // @desc    Send phone number for OTP verification
 // @access  Public
 const login = catchAsyncError(async (req, res, next) => {
-  const { phoneNumber } = req.body;
+  const { phone } = req.body;
   
 
-  const cleanPhone = phoneNumber.trim();
+  const cleanPhone = phone.trim();
 
   // In real implementation, you would send actual OTP here
   // For now, we'll just store phone in session-like response
@@ -28,7 +28,7 @@ const login = catchAsyncError(async (req, res, next) => {
 // @desc    Verify OTP and login/register user
 // @access  Public
 const verifyOtp = catchAsyncError(async (req, res, next) => {
-  const { phoneNumber, otp } = req.body;
+  const { phone, otp } = req.body;
   
 
 
@@ -36,7 +36,7 @@ const verifyOtp = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler('Please enter a valid 6-digit OTP.', 400));
   }
 
-  const cleanPhone = phoneNumber.trim();
+  const cleanPhone = phone.trim();
 
   // In real implementation, verify OTP from cache/database
   // For now, accept any 6-digit OTP for testing
