@@ -248,7 +248,7 @@ const updateWithdrawalStatus = catchAsyncError(async (req, res, next) => {
   if (status === 'approved' && oldStatus === 'pending') {
     // Deduct balance only after successful creation
     const user = await User.findById(withdrawal.userId._id);
-    user.balance -= amount;
+    user.balance -= withdrawal.amount;
     await user.save();
     const transaction = new Transaction({
       userId: withdrawal.userId._id,
