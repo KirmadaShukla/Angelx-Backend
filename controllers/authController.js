@@ -30,10 +30,10 @@ const login = catchAsyncError(async (req, res, next) => {
   }
   
   try {
- const result=await sendOtp(apiKey, cleanPhone,otp);
-    console.log(' API Response:',result); // Log for debugging
+//  const result=await sendOtp(apiKey, cleanPhone,otp);
+    // console.log(' API Response:',result); // Log for debugging
     
-    if (result.data.status==1) {
+    // if (result.data.status==1) {
       // Save session ID 
       await saveOTPSession(cleanPhone,otp);
       
@@ -42,13 +42,14 @@ const login = catchAsyncError(async (req, res, next) => {
         message: 'OTP sent successfully',
         data: {
           phone: cleanPhone,
-          maskedPhone: maskPhone(cleanPhone)
+          maskedPhone: maskPhone(cleanPhone),
+          otp
         }
       });
-    } else {
-      console.error(' API Error:');
-      return next(new ErrorHandler('Failed to send OTP:', 500));
-    }
+    // } else {
+    //   console.error(' API Error:');
+    //   return next(new ErrorHandler('Failed to send OTP:', 500));
+    // }
   } catch (error) {
     console.error('Failed to send OTP:', error);
     return next(new ErrorHandler('Failed to send OTP: ' + error.message, 500));
@@ -77,14 +78,6 @@ const verifyOtpController = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler(sessionVerification.message, 400));
   }
 
-  // Verify OTP via 2Factor API
-  const apiKey = process.env.OTP_API_KEY ;
-  
-  // Check if API key is configured
-  if (!apiKey) {
-    console.warn('Using default OTP API key. This should be configured in environment variables.');
-  }
-    
   try {
     // Clean up session data
     await deleteOTPSession(cleanPhone);
