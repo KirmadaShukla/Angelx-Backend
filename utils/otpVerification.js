@@ -19,7 +19,7 @@ const sendOtp = async (apiKey, phoneNumber,otp) => {
   
   try {
     const url = `https://2factor.in/API/V1/${apiKey}/SMS/${phoneNumber}/${otp}`;
-    const response = await axios.get(url, { timeout: 10000 });
+    const response = await axios.get(url);
     return response.data;
   } catch (error) {
     console.log('Error sending OTP:', error);
@@ -41,7 +41,7 @@ const verifyOtp = async (apiKey, sessionId, otp) => {
   
   try {
     const url = `https://2factor.in/API/V1/${apiKey}/SMS/VERIFY/${sessionId}/${otp}`;
-    const response = await axios.get(url, { timeout: 10000 });
+    const response = await axios.get(url);
     
 
     return response.data;
