@@ -1,3 +1,87 @@
+# AngelX Cryptocurrency Exchange API
+
+This is the backend API for the AngelX cryptocurrency exchange platform, built with Node.js, Express, and MongoDB.
+
+## Features
+
+- User authentication with phone number and OTP
+- Cryptocurrency exchange functionality (USDT to INR)
+- Deposit and withdrawal management
+- Admin dashboard for managing users and transactions
+- Real-time exchange rates from CoinGecko
+- Secure JWT-based authentication
+
+## Prerequisites
+
+- Node.js (v14 or higher)
+- MongoDB
+- 2Factor.in API key for OTP service
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd Angelx-NodeJs
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Create a `.env` file based on `.env.example`:
+   ```bash
+   cp .env.example .env
+   ```
+   
+4. Update the `.env` file with your configuration:
+   - Set your `OTP_API_KEY` from 2Factor.in
+   - Configure your MongoDB connection
+   - Set your JWT secret
+
+5. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## API Endpoints
+
+See [API_DOCUMENTATION.md](API_DOCUMENTATION.md) for detailed API documentation.
+
+## OTP Authentication Flow
+
+AngelX uses phone number and OTP for user authentication with database session storage:
+
+1. User sends their phone number to `/api/v1/auth/login`
+2. System sends OTP via 2Factor.in SMS API and stores session ID in database
+3. User receives OTP on their phone and sends it to `/api/v1/auth/verify-otp`
+4. System retrieves session ID from database and verifies OTP with 2Factor API
+5. If OTP is valid, user receives a JWT token for authentication
+
+## Testing
+
+Run the comprehensive API test suite:
+```bash
+npm run test:flow
+```
+
+Run the OTP functionality test:
+```bash
+npm run test:otp
+```
+
+## Seeding Data
+
+To seed initial data (admin user, exchange methods, etc.):
+```bash
+npm run seed
+```
+
+## License
+
+This project is licensed under the ISC License.
+
 # AngelX Cryptocurrency Exchange Platform
 
 AngelX is a comprehensive cryptocurrency exchange platform that allows users to deposit, withdraw, and exchange cryptocurrencies for fiat currency. This documentation provides a detailed overview of the system architecture, API endpoints, and transaction flows.
@@ -286,6 +370,12 @@ The exchange flow allows users to convert cryptocurrency to fiat currency.
 - `amount`: Number - USDT amount
 - `status`: String (enum: completed, processing)
 
+### OtpSession
+- `phone`: String - User's phone number
+- `sessionId`: String - Session ID from OTP service
+- `otp`: String - Generated OTP (optional)
+- `createdAt`: Date - Session creation time with 5-minute expiration
+
 ## Testing
 
 The platform includes comprehensive test scripts to verify functionality:
@@ -293,11 +383,20 @@ The platform includes comprehensive test scripts to verify functionality:
 1. **Transaction Flow Tests**: `tests/final_transaction_flow_test.sh`
 2. **API Endpoint Tests**: `tests/api_by_api_test.sh`
 3. **Exchange Tests**: `tests/exchange_deposit_test.sh`
+4. **OTP Database Tests**: `npm run test:otp-db`
+5. **OTP Flow Tests**: `npm run test:otp-flow`
 
 To run tests:
 ```bash
+# For shell script tests
 cd tests
 ./final_transaction_flow_test.sh
+
+# For OTP database tests
+npm run test:otp-db
+
+# For OTP flow tests
+npm run test:otp-flow
 ```
 
 ## Deployment

@@ -21,11 +21,10 @@ This document provides detailed information about all API endpoints available in
   ```json
   {
     "success": true,
-    "message": "OTP verification initiated",
+    "message": "OTP sent successfully",
     "data": {
       "phone": "9876543210",
-      "maskedPhone": "987*****10",
-      "otp": "123456"
+      "maskedPhone": "987*****10"
     }
   }
   ```
