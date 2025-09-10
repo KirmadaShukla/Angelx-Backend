@@ -6,10 +6,6 @@ const otpSessionSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  sessionId: {
-    type: String,
-    required: true
-  },
   otp: {
     type: String,
     required: false // Not required as 2Factor generates the OTP

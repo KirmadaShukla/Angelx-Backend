@@ -1,13 +1,13 @@
-// Utility functions for OTP verification with 2Factor API
 const axios = require('axios');
 
 /**
- * Send OTP via 2Factor API
- * @param {string} apiKey - 2Factor API Key
+ * Send OTP via NINZA SMS API
+ * @param {string} apiKey - NINZA SMS API Key
  * @param {string} phoneNumber - Phone number to send OTP to
+ * @param {string} otp - OTP to send
  * @returns {Promise<object>} - API response
  */
-const sendOtp = async (apiKey, phoneNumber,otp) => {
+const sendOtp = async (apiKey, phoneNumber, otp) => {
   // Validate inputs
   if (!apiKey) {
     throw new Error('OTP API key is missing. Please check your environment configuration.');
@@ -17,40 +17,29 @@ const sendOtp = async (apiKey, phoneNumber,otp) => {
     throw new Error('Phone number is required');
   }
   
-  try {
-    const url = `https://2factor.in/API/V1/${apiKey}/SMS/${phoneNumber}/${otp}`;
-    const response = await axios.get(url);
-    return response.data;
-  } catch (error) {
-    console.log('Error sending OTP:', error);
+  if (!otp) {
+    throw new Error('OTP is required');
   }
-};
 
-/**
- * Verify OTP via 2Factor API
- * @param {string} apiKey - 2Factor API Key
- * @param {string} sessionId - Session ID from send OTP response
- * @param {string} otp - OTP entered by user
- * @returns {Promise<object>} - API response
- */
-const verifyOtp = async (apiKey, sessionId, otp) => {
-  // Validate inputs
-  if (!apiKey || !sessionId || !otp) {
-    throw new Error('Missing required parameters for OTP verification');
-  }
-  
   try {
-    const url = `https://2factor.in/API/V1/${apiKey}/SMS/VERIFY/${sessionId}/${otp}`;
-    const response = await axios.get(url);
+    const response = await axios.post('https://ninzasms.in.net/auth/send_sms', {
+      sender_id: '15574',
+      variables_values: otp,
+      numbers: phoneNumber
+    }, {
+      headers: {
+        'authorization': apiKey,
+        'content-type': 'application/json'
+      }
+    });
     
-
-    return response.data;
+    return response;
   } catch (error) {
-   console.error('Error verifying OTP:', error);
+    console.error('Error sending OTP:', error.response?.data || error.message);
+    throw new Error('Failed to send OTP: ' + (error.response?.data?.message || error.message));
   }
 };
 
 module.exports = {
   sendOtp,
-  verifyOtp
 };

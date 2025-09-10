@@ -4,7 +4,7 @@ const { maskPhone } = require('../middleware/auth');
 const catchAsyncError = require('../utils/catchAsyncError');
 const sendToken = require('../utils/sendToken');
 const { ErrorHandler } = require('../utils/ErrorHandler');
-const { sendOtp, verifyOtp } = require('../utils/otpVerification');
+const { sendOtp } = require('../utils/otpVerification');
 const { saveOTPSession, verifyOTPSession, deleteOTPSession, generateSecureOTP } = require('../utils/otpUtils');
 
 // @desc    Send phone number for OTP verification
@@ -31,11 +31,11 @@ const login = catchAsyncError(async (req, res, next) => {
   
   try {
  const result=await sendOtp(apiKey, cleanPhone,otp);
-    console.log('2Factor API Response:',result.Status); // Log for debugging
+    console.log(' API Response:',result); // Log for debugging
     
-    if (result.Status === 'Success') {
+    if (result.data.status==1) {
       // Save session ID 
-      await saveOTPSession(cleanPhone, result.Details,otp);
+      await saveOTPSession(cleanPhone,otp);
       
       res.status(200).json({
         success: true,
@@ -46,7 +46,7 @@ const login = catchAsyncError(async (req, res, next) => {
         }
       });
     } else {
-      console.error('2Factor API Error:');
+      console.error(' API Error:');
       return next(new ErrorHandler('Failed to send OTP:', 500));
     }
   } catch (error) {
@@ -84,18 +84,11 @@ const verifyOtpController = catchAsyncError(async (req, res, next) => {
   if (!apiKey) {
     console.warn('Using default OTP API key. This should be configured in environment variables.');
   }
-  
-  const sessionId = sessionVerification.session.sessionId;
-  
-  try {
-    const result = await verifyOtp(apiKey, sessionId, otp);
-    console.log('2Factor Verification Response:', result); // Log for debugging
     
+  try {
     // Clean up session data
     await deleteOTPSession(cleanPhone);
     
-    if (result.Status === 'Success' && result.Details === 'OTP Matched') {
-      // Check if user exists
       let user = await User.findOne({ phone: cleanPhone });
       
       if (!user) {
@@ -110,10 +103,6 @@ const verifyOtpController = catchAsyncError(async (req, res, next) => {
 
       // Send token using sendToken utility
       sendToken(user, 200, res);
-    } else {
-      console.error('2Factor Verification Error:', result);
-      return next(new ErrorHandler('Invalid OTP or verification failed: ' + (result.Details || result.Message || 'Please try again'), 400));
-    }
   } catch (error) {
     console.error('Failed to verify OTP:', error);
     // Clean up session data even on error

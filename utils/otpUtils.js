@@ -18,7 +18,7 @@ const generateSecureOTP = () => {
 };
 
 // Save OTP session with session ID in database
-const saveOTPSession = async (phone, sessionId, otp = null) => {
+const saveOTPSession = async (phone, otp = null) => {
   try {
     // Delete any existing sessions for this phone number
     await OtpSession.deleteMany({ phone });
@@ -26,7 +26,6 @@ const saveOTPSession = async (phone, sessionId, otp = null) => {
     // Create new OTP session
     const otpSession = new OtpSession({
       phone,
-      sessionId,
       otp // This might be null if using external OTP service like 2Factor
     });
     
