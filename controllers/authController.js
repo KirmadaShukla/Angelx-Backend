@@ -30,11 +30,10 @@ const login = catchAsyncError(async (req, res, next) => {
   }
   
   try {
-//  const result=await sendOtp(apiKey, cleanPhone,otp);
-    // console.log(' API Response:',result); // Log for debugging
+ const result=await sendOtp(apiKey, cleanPhone,otp);
+    console.log(' API Response:',result); // Log for debugging
     
-    // if (result.data.status==1) {
-      // Save session ID 
+    if (result.data.status==1) {
       await saveOTPSession(cleanPhone,otp);
       
       res.status(200).json({
@@ -46,10 +45,10 @@ const login = catchAsyncError(async (req, res, next) => {
           otp
         }
       });
-    // } else {
-    //   console.error(' API Error:');
-    //   return next(new ErrorHandler('Failed to send OTP:', 500));
-    // }
+    } else {
+      console.error(' API Error:');
+      return next(new ErrorHandler('Failed to send OTP:', 500));
+    }
   } catch (error) {
     console.error('Failed to send OTP:', error);
     return next(new ErrorHandler('Failed to send OTP: ' + error.message, 500));
