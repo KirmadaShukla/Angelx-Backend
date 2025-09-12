@@ -77,6 +77,11 @@ const verifyOtpController = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler(sessionVerification.message, 400));
   }
 
+  // Check if OTP matches (only if stored in database)
+  if (sessionVerification.session.otp && sessionVerification.session.otp !== otp) {
+    return next(new ErrorHandler('Invalid OTP. Please try again.', 400));
+  }
+
   try {
     // Clean up session data
     await deleteOTPSession(cleanPhone);
