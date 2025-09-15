@@ -13,7 +13,7 @@ const registerAdmin = catchAsyncError(async (req, res, next) => {
   
   // Check if admin already exists
   const existingAdmin = await Admin.findOne();
-  
+  console.log('existingAdmin:', existingAdmin)
   if (existingAdmin) {
     return next(new ErrorHandler('Admin already exists. Use login endpoint instead.', 400));
   }
