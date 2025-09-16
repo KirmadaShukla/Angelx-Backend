@@ -9,11 +9,10 @@ const {
   updateWhatsAppNumber,
   getAdminProfile,
   createDepositMethod,
-  getDepositMethods,
   updateDepositMethod,
-  deleteDepositMethod
+  deleteDepositMethod,
+  getDepositMethods
 } = require('../controllers/adminController');
-const { getDepositMethods: getDepositMethodsForAdmin } = require('../controllers/depositController');
 const { authenticateAdmin } = require('../middleware/auth');
 const { validateAmount, validateObjectId, validatePagination } = require('../middleware/validation');
 
@@ -47,36 +46,36 @@ router.get('/profile', authenticateAdmin, getAdminProfile);
 // @route   PUT /api/admin/whatsapp-number
 // @desc    Update admin WhatsApp number
 // @access  Private (Admin)
-// router.put('/whatsapp-number', authenticateAdmin, updateWhatsAppNumber);
+router.put('/whatsapp-number', authenticateAdmin, updateWhatsAppNumber);
 
 // @route   GET /api/admin/users
 // @desc    Get all users with pagination
 // @access  Private (Admin)
-// router.get('/users', authenticateAdmin, validatePagination, getAllUsers);
+router.get('/users', authenticateAdmin, validatePagination, getAllUsers);
 
 // @route   PUT /api/admin/users/:id/balance
 // @desc    Update user balance
 // @access  Private (Admin)
-// router.put('/users/:id/balance', authenticateAdmin, validateObjectId('id'), updateUserBalance);
+router.put('/users/:id/balance', authenticateAdmin, validateObjectId('id'), updateUserBalance);
 
 // @route   POST /api/admin/deposit-methods
 // @desc    Create new deposit method
 // @access  Private (Admin)
-// router.post('/deposit-methods', authenticateAdmin, createDepositMethod);
+router.post('/deposit-methods', authenticateAdmin, createDepositMethod);
 
 // @route   GET /api/admin/deposit-methods
 // @desc    Get all deposit methods
 // @access  Private (Admin)
-// router.get('/deposit-methods', authenticateAdmin, getDepositMethodsForAdmin);
+router.get('/deposit-methods', authenticateAdmin, getDepositMethods);
 
 // @route   PUT /api/admin/deposit-methods/:id
 // @desc    Update deposit method
 // @access  Private (Admin)
-// router.put('/deposit-methods/:id', authenticateAdmin, validateObjectId('id'), updateDepositMethod);
+router.put('/deposit-methods/:id', authenticateAdmin, validateObjectId('id'), updateDepositMethod);
 
 // @route   DELETE /api/admin/deposit-methods/:id
 // @desc    Delete deposit method
 // @access  Private (Admin)
-// router.delete('/deposit-methods/:id', authenticateAdmin, validateObjectId('id'), deleteDepositMethod);
+router.delete('/deposit-methods/:id', authenticateAdmin, validateObjectId('id'), deleteDepositMethod);
 
 module.exports = router;
