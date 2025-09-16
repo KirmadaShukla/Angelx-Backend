@@ -6,6 +6,8 @@ const {
   getAdminDashboard,
   getAllUsers,
   updateUserBalance,
+  updateWhatsAppNumber,
+  getAdminProfile,
   createDepositMethod,
   getDepositMethods,
   updateDepositMethod,
@@ -36,6 +38,16 @@ router.post('/logout', authenticateAdmin, adminLogout);
 // @desc    Get admin dashboard data
 // @access  Private (Admin)
 router.get('/dashboard', authenticateAdmin, getAdminDashboard);
+
+// @route   GET /api/admin/profile
+// @desc    Get admin profile
+// @access  Private (Admin)
+router.get('/profile', authenticateAdmin, getAdminProfile);
+
+// @route   PUT /api/admin/whatsapp-number
+// @desc    Update admin WhatsApp number
+// @access  Private (Admin)
+router.put('/whatsapp-number', authenticateAdmin, updateWhatsAppNumber);
 
 // @route   GET /api/admin/users
 // @desc    Get all users with pagination

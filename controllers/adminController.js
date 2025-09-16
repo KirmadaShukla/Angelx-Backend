@@ -210,101 +210,55 @@ const updateUserBalance = catchAsyncError(async (req, res, next) => {
   });
 });
 
-// @desc    Create new deposit method
+// @desc    Update admin WhatsApp number
 // @access  Private (Admin)
-const createDepositMethod = catchAsyncError(async (req, res, next) => {
-  const { name, networkCode, address, qrPath } = req.body;
+const updateWhatsAppNumber = catchAsyncError(async (req, res, next) => {
+  const { whatsappNumber } = req.body;
   
-  if (!name || !networkCode || !address) {
-    return next(new ErrorHandler('Name, network code, and address are required', 400));
+  if (!whatsappNumber) {
+    return next(new ErrorHandler('WhatsApp number is required', 400));
   }
 
-  // Check if network code already exists
-  const existingMethod = await DepositMethod.findOne({ networkCode });
-  if (existingMethod) {
-    return next(new ErrorHandler('Network code already exists', 400));
+  // Validate WhatsApp number format (basic validation)
+  // This regex allows for international format with optional + and spaces
+  const whatsappRegex = /^\+?[1-9]\d{1,14}$/;
+  if (!whatsappRegex.test(whatsappNumber.replace(/\s+/g, ''))) {
+    return next(new ErrorHandler('Please provide a valid WhatsApp number', 400));
   }
 
-  const depositMethod = new DepositMethod({
-    name: name.trim(),
-    networkCode: networkCode.trim(),
-    address: address.trim(),
-    qrPath: qrPath ? qrPath.trim() : null
-  });
+  // Update admin's WhatsApp number
+  const admin = await Admin.findByIdAndUpdate(
+    req.admin._id,
+    { whatsappNumber: whatsappNumber.trim() },
+    { new: true, runValidators: true }
+  ).select('-password -__v');
 
-  await depositMethod.save();
+  if (!admin) {
+    return next(new ErrorHandler('Admin not found', 404));
+  }
 
-  res.status(201).json({
+  res.status(200).json({
     success: true,
-    message: 'Deposit method created successfully',
+    message: 'WhatsApp number updated successfully',
     data: {
-      method: depositMethod
+      admin
     }
   });
 });
 
-// @desc    Get all deposit methods
+// @desc    Get admin profile with WhatsApp number
 // @access  Private (Admin)
-const getDepositMethods = catchAsyncError(async (req, res, next) => {
-  const methods = await DepositMethod.find()
-    .sort({ createdAt: -1 })
-    .select('-__v');
-
-  res.status(200).json({
-    success: true,
-    data: {
-      methods
-    }
-  });
-});
-
-// @desc    Update deposit method
-// @access  Private (Admin)
-const updateDepositMethod = catchAsyncError(async (req, res, next) => {
-  const { name, address, qrPath, isActive } = req.body;
+const getAdminProfile = catchAsyncError(async (req, res, next) => {
+  const admin = await Admin.findById(req.admin._id).select('-password -__v');
   
-  const method = await DepositMethod.findById(req.params.id);
-  
-  if (!method) {
-    return next(new ErrorHandler('Deposit method not found', 404));
+  if (!admin) {
+    return next(new ErrorHandler('Admin not found', 404));
   }
 
-  if (name) method.name = name.trim();
-  if (address) method.address = address.trim();
-  if (qrPath !== undefined) method.qrPath = qrPath ? qrPath.trim() : null;
-  if (typeof isActive === 'boolean') method.isActive = isActive;
-
-  await method.save();
-
   res.status(200).json({
     success: true,
-    message: 'Deposit method updated successfully',
     data: {
-      method
-    }
-  });
-});
-
-// @desc    Delete deposit method
-// @access  Private (Admin)
-const deleteDepositMethod = catchAsyncError(async (req, res, next) => {
-  const method = await DepositMethod.findById(req.params.id);
-  
-  if (!method) {
-    return next(new ErrorHandler('Deposit method not found', 404));
-  }
-
-  await DepositMethod.findByIdAndDelete(req.params.id);
-
-  res.status(200).json({
-    success: true,
-    message: 'Deposit method deleted successfully',
-    data: {
-      deletedMethod: {
-        id: method._id,
-        name: method.name,
-        networkCode: method.networkCode
-      }
+      admin
     }
   });
 });
@@ -316,8 +270,6 @@ module.exports = {
   getAdminDashboard,
   getAllUsers,
   updateUserBalance,
-  createDepositMethod,
-  getDepositMethods,
-  updateDepositMethod,
-  deleteDepositMethod
+  updateWhatsAppNumber,
+  getAdminProfile
 };

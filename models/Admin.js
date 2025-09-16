@@ -13,6 +13,10 @@ const adminSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+  whatsappNumber: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true
