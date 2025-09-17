@@ -41,9 +41,9 @@ const createDeposit = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler('Deposit method not found or inactive', 404));
   }
 
-  // Set expiry time (90 minutes from now - 1.5 hours)
+  // Set expiry time (105 minutes from now - 1 hour 45 minutes)
   const expiresAt = new Date();
-  expiresAt.setMinutes(expiresAt.getMinutes() + 90);
+  expiresAt.setMinutes(expiresAt.getMinutes() + 105);
 
   // Create deposit record
   const deposit = new Deposit({
