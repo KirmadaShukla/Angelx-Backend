@@ -237,7 +237,7 @@ const getAllDeposits = catchAsyncError(async (req, res, next) => {
 
   const deposits = await Deposit.find(query)
     .populate('userId', 'phone')
-    .populate('methodId', 'name networkCode')
+    .populate('methodId', 'name networkCode address qrPath')
     .sort({ createdAt: -1 })
     .limit(limit * 1)
     .skip((page - 1) * limit)

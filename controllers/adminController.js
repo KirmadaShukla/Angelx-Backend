@@ -1,6 +1,10 @@
 const Admin = require('../models/Admin');
 const User = require('../models/User');
 const DepositMethod = require('../models/DepositMethod');
+const Deposit = require('../models/Deposit');
+const { Exchange } = require('../models/Exchange');
+const Withdraw = require('../models/Withdraw');
+const mongoose = require('mongoose');
 const { generateToken } = require('../middleware/auth');
 const catchAsyncError = require('../utils/catchAsyncError');
 const sendToken = require('../utils/sendToken');
@@ -359,6 +363,97 @@ const deleteDepositMethod = catchAsyncError(async (req, res, next) => {
     }
   });
 });
+
+// @desc    Bulk delete deposits
+// @access  Private (Admin)
+const bulkDeleteDeposits = catchAsyncError(async (req, res, next) => {
+  const { ids } = req.body;
+
+  // Validation
+  if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    return next(new ErrorHandler('IDs array is required and cannot be empty', 400));
+  }
+
+  // Validate each ID
+  for (const id of ids) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(new ErrorHandler(`Invalid ID: ${id}`, 400));
+    }
+  }
+
+  // Delete deposits
+  const result = await Deposit.deleteMany({ _id: { $in: ids } });
+
+  res.status(200).json({
+    success: true,
+    message: `Successfully deleted ${result.deletedCount} deposit(s)`,
+    data: {
+      deletedCount: result.deletedCount,
+      requestedCount: ids.length
+    }
+  });
+});
+
+// @desc    Bulk delete exchanges
+// @access  Private (Admin)
+const bulkDeleteExchanges = catchAsyncError(async (req, res, next) => {
+  const { ids } = req.body;
+
+  // Validation
+  if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    return next(new ErrorHandler('IDs array is required and cannot be empty', 400));
+  }
+
+  // Validate each ID
+  for (const id of ids) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(new ErrorHandler(`Invalid ID: ${id}`, 400));
+    }
+  }
+
+  // Delete exchanges
+  const result = await Exchange.deleteMany({ _id: { $in: ids } });
+
+  res.status(200).json({
+    success: true,
+    message: `Successfully deleted ${result.deletedCount} exchange(s)`,
+    data: {
+      deletedCount: result.deletedCount,
+      requestedCount: ids.length
+    }
+  });
+});
+
+// @desc    Bulk delete withdrawals
+// @access  Private (Admin)
+const bulkDeleteWithdrawals = catchAsyncError(async (req, res, next) => {
+  const { ids } = req.body;
+
+  // Validation
+  if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    return next(new ErrorHandler('IDs array is required and cannot be empty', 400));
+  }
+
+  // Validate each ID
+  for (const id of ids) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(new ErrorHandler(`Invalid ID: ${id}`, 400));
+    }
+  }
+
+  // Delete withdrawals
+  const result = await Withdraw.deleteMany({ _id: { $in: ids } });
+
+  res.status(200).json({
+    success: true,
+    message: `Successfully deleted ${result.deletedCount} withdrawal(s)`,
+    data: {
+      deletedCount: result.deletedCount,
+      requestedCount: ids.length
+    }
+  });
+});
+
 module.exports = {
   registerAdmin,
   adminLogin,
@@ -369,7 +464,10 @@ module.exports = {
   updateWhatsAppNumber,
   getAdminProfile,
   createDepositMethod,
-  getDepositMethods,
   updateDepositMethod,
-  deleteDepositMethod
+  deleteDepositMethod,
+  getDepositMethods,
+  bulkDeleteDeposits,
+  bulkDeleteExchanges,
+  bulkDeleteWithdrawals
 };

@@ -11,7 +11,10 @@ const {
   createDepositMethod,
   updateDepositMethod,
   deleteDepositMethod,
-  getDepositMethods
+  getDepositMethods,
+  bulkDeleteDeposits,
+  bulkDeleteExchanges,
+  bulkDeleteWithdrawals
 } = require('../controllers/adminController');
 const { authenticateAdmin } = require('../middleware/auth');
 const { validateAmount, validateObjectId, validatePagination } = require('../middleware/validation');
@@ -77,5 +80,20 @@ router.put('/deposit-methods/:id', authenticateAdmin, validateObjectId('id'), up
 // @desc    Delete deposit method
 // @access  Private (Admin)
 router.delete('/deposit-methods/:id', authenticateAdmin, validateObjectId('id'), deleteDepositMethod);
+
+// @route   POST /api/admin/bulk-delete/deposits
+// @desc    Bulk delete deposits
+// @access  Private (Admin)
+router.post('/bulk-delete/deposits', authenticateAdmin, bulkDeleteDeposits);
+
+// @route   POST /api/admin/bulk-delete/exchanges
+// @desc    Bulk delete exchanges
+// @access  Private (Admin)
+router.post('/bulk-delete/exchanges', authenticateAdmin, bulkDeleteExchanges);
+
+// @route   POST /api/admin/bulk-delete/withdrawals
+// @desc    Bulk delete withdrawals
+// @access  Private (Admin)
+router.post('/bulk-delete/withdrawals', authenticateAdmin, bulkDeleteWithdrawals);
 
 module.exports = router;
