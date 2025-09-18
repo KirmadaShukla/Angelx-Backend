@@ -43,7 +43,6 @@ const login = catchAsyncError(async (req, res, next) => {
         data: {
           phone: cleanPhone,
           maskedPhone: maskPhone(cleanPhone),
-          otp
         }
       });
     } else {
@@ -152,7 +151,8 @@ const updateTransactionPassword = catchAsyncError(async (req, res, next) => {
 const getWhatsAppNumber = catchAsyncError(async (req, res, next) => { 
   try {
     // Since there's only one admin, we can fetch the first admin record
-    const admin = await Admin.findOne({}).select('whatsappNumber -_id');
+    // Select only the whatsappNumber field
+    const admin = await Admin.findOne({}).select('whatsappNumber');
     
     if (!admin) {
       return res.status(404).json({
