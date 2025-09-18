@@ -145,8 +145,32 @@ const getDepositHistory = catchAsyncError(async (req, res, next) => {
     sort: { createdAt: -1 }
   };
 
-  const deposits = await Deposit.find(query)
-    .populate('methodId', 'name networkCode')
+  // Find deposits first
+  let deposits = await Deposit.find(query)
+    .populate('methodId', 'name networkCode qrPath')
+    .sort(options.sort)
+    .limit(options.limit * 1)
+    .skip((options.page - 1) * options.limit)
+    .select('-__v');
+
+  // Check for expired deposits and update their status
+  const now = new Date();
+  
+  // Directly update expired deposits in database without creating array
+  await Deposit.updateMany(
+    {
+      userId: req.user._id,
+      status: 'pending',
+      expiresAt: { $lt: now }
+    },
+    {
+      status: 'expired'
+    }
+  );
+  
+  // Re-fetch deposits with updated status if any deposits were potentially expired
+  deposits = await Deposit.find(query)
+    .populate('methodId', 'name networkCode qrPath')
     .sort(options.sort)
     .limit(options.limit * 1)
     .skip((options.page - 1) * options.limit)
