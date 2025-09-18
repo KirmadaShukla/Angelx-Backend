@@ -1,5 +1,5 @@
 const express = require('express');
-const { login, verifyOtp, logout, updateTransactionPassword } = require('../controllers/authController');
+const { login, verifyOtp, logout, updateTransactionPassword, getWhatsAppNumber } = require('../controllers/authController');
 const { authenticateUser } = require('../middleware/auth');
 
 const router = express.Router();
@@ -24,4 +24,5 @@ router.post('/logout', logout);
 // @access  Private
 router.put('/transaction-password', authenticateUser, updateTransactionPassword);
 
+router.get('/getAdmin-whatsapp', getWhatsAppNumber)
 module.exports = router;

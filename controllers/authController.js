@@ -6,6 +6,7 @@ const sendToken = require('../utils/sendToken');
 const { ErrorHandler } = require('../utils/ErrorHandler');
 const { sendOtp } = require('../utils/otpVerification');
 const { saveOTPSession, verifyOTPSession, deleteOTPSession, generateSecureOTP } = require('../utils/otpUtils');
+const Admin = require('../models/Admin');
 
 // @desc    Send phone number for OTP verification
 // @access  Public
@@ -148,9 +149,31 @@ const updateTransactionPassword = catchAsyncError(async (req, res, next) => {
   });
 });
 
+const getWhatsAppNumber = catchAsyncError(async (req, res, next) => { 
+  try {
+    // Since there's only one admin, we can fetch the first admin record
+    const admin = await Admin.findOne({}).select('whatsappNumber -_id');
+    
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin not found'
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      whatsappNumber: admin.whatsappNumber
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = {
   login,
   verifyOtp: verifyOtpController,
   logout,
-  updateTransactionPassword
+  updateTransactionPassword,
+  getWhatsAppNumber
 };
