@@ -231,10 +231,15 @@ const createExchange = catchAsyncError(async (req, res, next) => {
   const rate = rateDoc.dollarRate;
   const inrAmount = usdtAmount * rate;
 
-  // NOTE: We're NOT deducting the balance here anymore
-  // Balance will be deducted when admin approves the exchange
+  // Check if user has sufficient balance
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return next(new ErrorHandler('User not found', 404));
+  }
 
-  // Create exchange record
+  if (user.balance < usdtAmount) {
+    return next(new ErrorHandler('Insufficient USDT balance', 400));
+  }
   const exchange = new Exchange({
     userId: req.user._id,
     methodId,
