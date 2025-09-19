@@ -350,9 +350,9 @@ const updateExchangeStatus = catchAsyncError(async (req, res, next) => {
     }
   }
   
-  // If status is changing from 'pending' to 'failed', refund the user's balance
-  // This would only happen if balance was deducted elsewhere, but we're adding it for safety
-  if (oldStatus === 'pending' && newStatus === 'failed') {
+  // If status is changing from 'completed' to 'failed', refund the user's balance
+  // This would happen if an admin mistakenly approved an exchange and then changed it to failed
+  if (oldStatus === 'completed' && newStatus === 'failed') {
     try {
       // Add the USDT amount back to the user's balance
       const user = await User.findById(exchange.userId);
@@ -361,17 +361,45 @@ const updateExchangeStatus = catchAsyncError(async (req, res, next) => {
         await user.save();
         
         console.log(`Refunded ${exchange.usdtAmount} USDT to user ${user.phone} due to failed exchange`);
+      } else {
+        return next(new ErrorHandler('User not found for refund', 404));
       }
     } catch (error) {
       console.error('Error refunding user balance:', error);
-      // We don't return an error here as the status update should still succeed
-      // but we log the error for debugging
+      return next(new ErrorHandler('Failed to refund user balance: ' + error.message, 500));
     }
   }
+  
+  // If status is changing from 'failed' to 'completed', deduct the user's balance
+  if (oldStatus === 'failed' && newStatus === 'completed') {
+    try {
+      // Deduct the USDT amount from the user's balance
+      const user = await User.findById(exchange.userId);
+      if (user) {
+        // Check if user has sufficient balance
+        if (user.balance < exchange.usdtAmount) {
+          return next(new ErrorHandler('Insufficient USDT balance', 400));
+        }
+        
+        user.balance -= exchange.usdtAmount;
+        await user.save();
+        
+        console.log(`Deducted ${exchange.usdtAmount} USDT from user ${user.phone} for completed exchange`);
+      } else {
+        return next(new ErrorHandler('User not found for balance deduction', 404));
+      }
+    } catch (error) {
+      console.error('Error deducting user balance:', error);
+      return next(new ErrorHandler('Failed to deduct user balance: ' + error.message, 500));
+    }
+  }
+  
+  // If status is changing from 'failed' to 'pending', do nothing
+  if (oldStatus === 'failed' && newStatus === 'pending') {
+    // Do nothing as requested
+  }
 
-  // In a real implementation, this is where you would process the actual
-  // bank transfer to send INR to the user's bank account
-  // For now, we're just updating the status
+
 
   await exchange.save();
 
