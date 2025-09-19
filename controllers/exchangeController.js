@@ -231,16 +231,8 @@ const createExchange = catchAsyncError(async (req, res, next) => {
   const rate = rateDoc.dollarRate;
   const inrAmount = usdtAmount * rate;
 
-  // Check user balance
-  const user = await User.findById(req.user._id);
-
-  if (user.balance < usdtAmount) {
-    return next(new ErrorHandler('Insufficient USDT balance', 400));
-  }
-
-  // Deduct balance
-  user.balance -= usdtAmount;
-  await user.save();
+  // NOTE: We're NOT deducting the balance here anymore
+  // Balance will be deducted when admin approves the exchange
 
   // Create exchange record
   const exchange = new Exchange({
@@ -333,7 +325,49 @@ const updateExchangeStatus = catchAsyncError(async (req, res, next) => {
   }
 
   const oldStatus = exchange.status;
-  exchange.status = status;
+  const newStatus = status;
+  exchange.status = newStatus;
+
+  // If status is changing from 'pending' to 'completed', deduct the user's balance
+  if (oldStatus === 'pending' && newStatus === 'completed') {
+    try {
+      // Deduct the USDT amount from the user's balance
+      const user = await User.findById(exchange.userId);
+      if (user) {
+        // Check if user has sufficient balance
+        if (user.balance < exchange.usdtAmount) {
+          return next(new ErrorHandler('Insufficient USDT balance', 400));
+        }
+        
+        user.balance -= exchange.usdtAmount;
+        await user.save();
+        
+        console.log(`Deducted ${exchange.usdtAmount} USDT from user ${user.phone} for completed exchange`);
+      }
+    } catch (error) {
+      console.error('Error deducting user balance:', error);
+      return next(new ErrorHandler('Failed to deduct user balance: ' + error.message, 500));
+    }
+  }
+  
+  // If status is changing from 'pending' to 'failed', refund the user's balance
+  // This would only happen if balance was deducted elsewhere, but we're adding it for safety
+  if (oldStatus === 'pending' && newStatus === 'failed') {
+    try {
+      // Add the USDT amount back to the user's balance
+      const user = await User.findById(exchange.userId);
+      if (user) {
+        user.balance += exchange.usdtAmount;
+        await user.save();
+        
+        console.log(`Refunded ${exchange.usdtAmount} USDT to user ${user.phone} due to failed exchange`);
+      }
+    } catch (error) {
+      console.error('Error refunding user balance:', error);
+      // We don't return an error here as the status update should still succeed
+      // but we log the error for debugging
+    }
+  }
 
   // In a real implementation, this is where you would process the actual
   // bank transfer to send INR to the user's bank account
@@ -347,7 +381,7 @@ const updateExchangeStatus = catchAsyncError(async (req, res, next) => {
     data: {
       exchange,
       oldStatus,
-      newStatus: status
+      newStatus
     }
   });
 });
