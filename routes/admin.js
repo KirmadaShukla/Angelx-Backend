@@ -14,7 +14,9 @@ const {
   getDepositMethods,
   bulkDeleteDeposits,
   bulkDeleteExchanges,
-  bulkDeleteWithdrawals
+  bulkDeleteWithdrawals,
+  setWithdrawalLimit,
+  getWithdrawalLimit
 } = require('../controllers/adminController');
 const { authenticateAdmin } = require('../middleware/auth');
 const { validateAmount, validateObjectId, validatePagination } = require('../middleware/validation');
@@ -95,5 +97,15 @@ router.post('/bulk-delete/exchanges', authenticateAdmin, bulkDeleteExchanges);
 // @desc    Bulk delete withdrawals
 // @access  Private (Admin)
 router.post('/bulk-delete/withdrawals', authenticateAdmin, bulkDeleteWithdrawals);
+
+// @route   PUT /api/admin/withdrawal-limit
+// @desc    Set withdrawal limit
+// @access  Private (Admin)
+router.put('/withdrawal-limit', authenticateAdmin, setWithdrawalLimit);
+
+// @route   GET /api/admin/withdrawal-limit
+// @desc    Get withdrawal limit
+// @access  Private (Admin)
+router.get('/withdrawal-limit', authenticateAdmin, getWithdrawalLimit);
 
 module.exports = router;

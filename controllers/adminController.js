@@ -454,6 +454,53 @@ const bulkDeleteWithdrawals = catchAsyncError(async (req, res, next) => {
   });
 });
 
+// @desc    Set withdrawal limit
+// @access  Private (Admin)
+const setWithdrawalLimit = catchAsyncError(async (req, res, next) => {
+  const { limit } = req.body;
+
+  // Validation
+  if (typeof limit !== 'number' || limit < 0) {
+    return next(new ErrorHandler('Limit must be a non-negative number', 400));
+  }
+
+  // Update admin's withdrawal limit
+  const admin = await Admin.findByIdAndUpdate(
+    req.admin._id,
+    { withdrawalLimit: limit },
+    { new: true, runValidators: true }
+  ).select('-password -__v');
+
+  if (!admin) {
+    return next(new ErrorHandler('Admin not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Withdrawal limit updated successfully',
+    data: {
+      admin
+    }
+  });
+});
+
+// @desc    Get withdrawal limit
+// @access  Private (Admin)
+const getWithdrawalLimit = catchAsyncError(async (req, res, next) => {
+  const admin = await Admin.findById(req.admin._id).select('withdrawalLimit');
+
+  if (!admin) {
+    return next(new ErrorHandler('Admin not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: {
+      withdrawalLimit: admin.withdrawalLimit
+    }
+  });
+});
+
 module.exports = {
   registerAdmin,
   adminLogin,
@@ -469,5 +516,7 @@ module.exports = {
   getDepositMethods,
   bulkDeleteDeposits,
   bulkDeleteExchanges,
-  bulkDeleteWithdrawals
+  bulkDeleteWithdrawals,
+  setWithdrawalLimit,
+  getWithdrawalLimit
 };

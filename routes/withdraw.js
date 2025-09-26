@@ -10,6 +10,7 @@ const {
   getAdminWithdrawalStats
 } = require('../controllers/withdrawController');
 const { authenticateUser, authenticateAdmin } = require('../middleware/auth');
+const { checkWithdrawalLimit } = require('../middleware/withdrawalLimit');
 const { validateAmount, validateObjectId, validatePagination } = require('../middleware/validation');
 
 const router = express.Router();
@@ -17,7 +18,7 @@ const router = express.Router();
 // @route   POST /api/withdraw/create
 // @desc    Create new withdrawal request
 // @access  Private
-router.post('/create', authenticateUser, validateAmount, createWithdrawal);
+router.post('/create', authenticateUser, validateAmount, checkWithdrawalLimit, createWithdrawal);
 
 // @route   GET /api/withdraw/history
 // @desc    Get user's withdrawal history

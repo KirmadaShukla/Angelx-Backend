@@ -14,6 +14,7 @@ const {
 } = require('../controllers/exchangeController');
 const { authenticateUser, authenticateAdmin } = require('../middleware/auth');
 const { validateUsdtAmount, validateObjectId, validatePagination } = require('../middleware/validation');
+const { checkWithdrawalLimit } = require('../middleware/withdrawalLimit');
 
 const router = express.Router();
 
@@ -55,7 +56,7 @@ router.delete('/methods/:id', authenticateUser, validateObjectId('id'), deleteEx
 // @route   POST /api/exchange/create
 // @desc    Create new exchange (USDT to INR)
 // @access  Private
-router.post('/create', authenticateUser, validateUsdtAmount, createExchange);
+router.post('/create', authenticateUser, validateUsdtAmount, checkWithdrawalLimit,createExchange);
 
 // @route   GET /api/exchange/history
 // @desc    Get user's exchange history

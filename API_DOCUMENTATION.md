@@ -863,3 +863,46 @@ This document provides detailed information about all API endpoints available in
     }
   }
   ```
+
+## Admin Withdrawal Limit Management
+
+### Set Withdrawal Limit
+- **URL**: `/api/v1/admin/withdrawal-limit`
+- **Method**: `PUT`
+- **Access**: Admin
+- **Headers**: 
+  - `Authorization: Bearer <admin_token>`
+  - `Content-Type: application/json`
+- **Body**:
+  ```json
+  {
+    "limit": 10000
+  }
+  ```
+- **Success Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Withdrawal limit updated successfully",
+    "data": {
+      "admin": {
+        "withdrawalLimit": 10000
+      }
+    }
+  }
+  ```
+
+### Get Withdrawal Limit
+- **URL**: `/api/v1/admin/withdrawal-limit`
+- **Method**: `GET`
+- **Access**: Admin
+- **Headers**: `Authorization: Bearer <admin_token>`
+- **Success Response**:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "withdrawalLimit": 10000
+    }
+  }
+  ```

@@ -17,6 +17,10 @@ const adminSchema = new mongoose.Schema({
   whatsappNumber: {
     type: String,
     default: null
+  },
+  withdrawalLimit: {
+    type: Number,
+    default: 0 // 0 means no limit
   }
 }, {
   timestamps: true
