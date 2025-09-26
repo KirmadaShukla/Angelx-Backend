@@ -485,12 +485,19 @@ const setWithdrawalLimit = catchAsyncError(async (req, res, next) => {
 });
 
 // @desc    Get withdrawal limit
-// @access  Private (Admin)
+// @access  Public
 const getWithdrawalLimit = catchAsyncError(async (req, res, next) => {
-  const admin = await Admin.findById(req.admin._id).select('withdrawalLimit');
+  // Get the first admin (there should only be one)
+  const admin = await Admin.findOne().select('withdrawalLimit');
 
   if (!admin) {
-    return next(new ErrorHandler('Admin not found', 404));
+    // If no admin exists, return default limit of 0 (no limit)
+    return res.status(200).json({
+      success: true,
+      data: {
+        withdrawalLimit: 0
+      }
+    });
   }
 
   res.status(200).json({

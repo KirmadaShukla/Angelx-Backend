@@ -105,7 +105,7 @@ router.put('/withdrawal-limit', authenticateAdmin, setWithdrawalLimit);
 
 // @route   GET /api/admin/withdrawal-limit
 // @desc    Get withdrawal limit
-// @access  Private (Admin)
+// @access  Public
 router.get('/withdrawal-limit', getWithdrawalLimit);
 
 module.exports = router;
