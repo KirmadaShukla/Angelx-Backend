@@ -508,6 +508,63 @@ const getWithdrawalLimit = catchAsyncError(async (req, res, next) => {
   });
 });
 
+// @desc    Set user-specific withdrawal limit
+// @access  Private (Admin)
+const setUserWithdrawalLimit = catchAsyncError(async (req, res, next) => {
+  const { userId, limit } = req.body;
+
+  // Validation
+  if (!userId) {
+    return next(new ErrorHandler('User ID is required', 400));
+  }
+
+  if (typeof limit !== 'number' || limit < 0) {
+    return next(new ErrorHandler('Limit must be a non-negative number', 400));
+  }
+
+  // Update user's withdrawal limit
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { withdrawalLimit: limit },
+    { new: true, runValidators: true }
+  ).select('phone withdrawalLimit');
+
+  if (!user) {
+    return next(new ErrorHandler('User not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'User withdrawal limit updated successfully',
+    data: {
+      user
+    }
+  });
+});
+
+// @desc    Get user-specific withdrawal limit
+// @access  Private (Admin)
+const getUserWithdrawalLimit = catchAsyncError(async (req, res, next) => {
+  const { userId } = req.params;
+
+  if (!userId) {
+    return next(new ErrorHandler('User ID is required', 400));
+  }
+
+  const user = await User.findById(userId).select('phone withdrawalLimit');
+
+  if (!user) {
+    return next(new ErrorHandler('User not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: {
+      withdrawalLimit: user.withdrawalLimit
+    }
+  });
+});
+
 module.exports = {
   registerAdmin,
   adminLogin,
@@ -525,5 +582,7 @@ module.exports = {
   bulkDeleteExchanges,
   bulkDeleteWithdrawals,
   setWithdrawalLimit,
-  getWithdrawalLimit
+  getWithdrawalLimit,
+  setUserWithdrawalLimit,
+  getUserWithdrawalLimit
 };

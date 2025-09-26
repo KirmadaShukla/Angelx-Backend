@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema({
     minlength: 6,
     maxlength: 6,
     select: false // Don't include in queries by default
+  },
+  withdrawalLimit: {
+    type: Number,
+    default: 0 // 0 means no limit
   }
 }, {
   timestamps: true

@@ -106,7 +106,7 @@ This document provides detailed information about all API endpoints available in
         "maskedPhone": "987*****10",
         "balance": 500,
         "createdAt": "2025-09-02T15:37:18.515Z",
-        "updatedAt": "2025-09-02T17:40:25.979Z"
+        "updatedAt": "2025-09-02T15:37:18.515Z"
       }
     }
   }
@@ -196,6 +196,21 @@ This document provides detailed information about all API endpoints available in
         "hasNext": false,
         "hasPrev": false
       }
+    }
+  }
+  ```
+
+### Get User Withdrawal Limit
+- **URL**: `/api/v1/user/withdrawal-limit`
+- **Method**: `GET`
+- **Access**: User
+- **Headers**: `Authorization: Bearer <user_token>`
+- **Success Response**:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "withdrawalLimit": 5000
     }
   }
   ```
@@ -895,14 +910,58 @@ This document provides detailed information about all API endpoints available in
 ### Get Withdrawal Limit
 - **URL**: `/api/v1/admin/withdrawal-limit`
 - **Method**: `GET`
-- **Access**: Admin
-- **Headers**: `Authorization: Bearer <admin_token>`
+- **Access**: Public
 - **Success Response**:
   ```json
   {
     "success": true,
     "data": {
       "withdrawalLimit": 10000
+    }
+  }
+  ```
+
+### Set User Withdrawal Limit
+- **URL**: `/api/v1/admin/user-withdrawal-limit`
+- **Method**: `PUT`
+- **Access**: Admin
+- **Headers**: 
+  - `Authorization: Bearer <admin_token>`
+  - `Content-Type: application/json`
+- **Body**:
+  ```json
+  {
+    "userId": "68b70f2eea8139b9bea719b2",
+    "limit": 5000
+  }
+  ```
+- **Success Response**:
+  ```json
+  {
+    "success": true,
+    "message": "User withdrawal limit updated successfully",
+    "data": {
+      "user": {
+        "phone": "9876543210",
+        "withdrawalLimit": 5000
+      }
+    }
+  }
+  ```
+
+### Get User Withdrawal Limit
+- **URL**: `/api/v1/admin/user-withdrawal-limit/:userId`
+- **Method**: `GET`
+- **Access**: Admin
+- **Headers**: `Authorization: Bearer <admin_token>`
+- **URL Parameters**:
+  - `userId`: User ID
+- **Success Response**:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "withdrawalLimit": 5000
     }
   }
   ```

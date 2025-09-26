@@ -186,10 +186,28 @@ const getUserStats = catchAsyncError(async (req, res, next) => {
   });
 });
 
+// @desc    Get user withdrawal limit
+// @access  Private
+const getUserWithdrawalLimit = catchAsyncError(async (req, res, next) => {
+  const user = await User.findById(req.user._id).select('withdrawalLimit');
+  
+  if (!user) {
+    return next(new ErrorHandler('User not found', 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: {
+      withdrawalLimit: user.withdrawalLimit || 0
+    }
+  });
+});
+
 module.exports = {
   getProfile,
   getBalance,
   getDashboard,
   getTransactions,
-  getUserStats
+  getUserStats,
+  getUserWithdrawalLimit
 };

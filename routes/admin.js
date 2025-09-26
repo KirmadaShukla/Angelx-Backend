@@ -16,7 +16,9 @@ const {
   bulkDeleteExchanges,
   bulkDeleteWithdrawals,
   setWithdrawalLimit,
-  getWithdrawalLimit
+  getWithdrawalLimit,
+  setUserWithdrawalLimit,
+  getUserWithdrawalLimit
 } = require('../controllers/adminController');
 const { authenticateAdmin } = require('../middleware/auth');
 const { validateAmount, validateObjectId, validatePagination } = require('../middleware/validation');
@@ -107,5 +109,15 @@ router.put('/withdrawal-limit', authenticateAdmin, setWithdrawalLimit);
 // @desc    Get withdrawal limit
 // @access  Public
 router.get('/withdrawal-limit', getWithdrawalLimit);
+
+// @route   PUT /api/admin/user-withdrawal-limit
+// @desc    Set user-specific withdrawal limit
+// @access  Private (Admin)
+router.put('/user-withdrawal-limit', authenticateAdmin, setUserWithdrawalLimit);
+
+// @route   GET /api/admin/user-withdrawal-limit/:userId
+// @desc    Get user-specific withdrawal limit
+// @access  Private (Admin)
+router.get('/user-withdrawal-limit/:userId', authenticateAdmin, getUserWithdrawalLimit);
 
 module.exports = router;

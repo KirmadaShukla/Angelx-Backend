@@ -18,7 +18,7 @@ const router = express.Router();
 // @route   POST /api/withdraw/create
 // @desc    Create new withdrawal request
 // @access  Private
-router.post('/create', authenticateUser, validateAmount, checkWithdrawalLimit, createWithdrawal);
+router.post('/create', authenticateUser, validateAmount, createWithdrawal);
 
 // @route   GET /api/withdraw/history
 // @desc    Get user's withdrawal history

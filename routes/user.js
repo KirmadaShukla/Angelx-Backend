@@ -4,7 +4,8 @@ const {
   getBalance, 
   getDashboard,
   getTransactions,
-  getUserStats
+  getUserStats,
+  getUserWithdrawalLimit
 } = require('../controllers/userController');
 const { authenticateUser } = require('../middleware/auth');
 const { validatePagination } = require('../middleware/validation');
@@ -35,5 +36,10 @@ router.get('/transactions', authenticateUser, validatePagination, getTransaction
 // @desc    Get user statistics
 // @access  Private
 router.get('/stats', authenticateUser, getUserStats);
+
+// @route   GET /api/user/withdrawal-limit
+// @desc    Get user withdrawal limit
+// @access  Private
+router.get('/withdrawal-limit', authenticateUser, getUserWithdrawalLimit);
 
 module.exports = router;
