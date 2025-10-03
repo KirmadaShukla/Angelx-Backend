@@ -147,7 +147,7 @@ const getDepositHistory = catchAsyncError(async (req, res, next) => {
 
   // Find deposits first
   let deposits = await Deposit.find(query)
-    .populate('methodId', 'name networkCode qrPath')
+    .populate('methodId', 'name networkCode qrCode qrPath')
     .sort(options.sort)
     .limit(options.limit * 1)
     .skip((options.page - 1) * options.limit)
@@ -170,7 +170,7 @@ const getDepositHistory = catchAsyncError(async (req, res, next) => {
   
   // Re-fetch deposits with updated status if any deposits were potentially expired
   deposits = await Deposit.find(query)
-    .populate('methodId', 'name networkCode qrPath')
+    .populate('methodId', 'name networkCode qrCode')
     .sort(options.sort)
     .limit(options.limit * 1)
     .skip((options.page - 1) * options.limit)
@@ -200,7 +200,7 @@ const getDepositById = catchAsyncError(async (req, res, next) => {
   const deposit = await Deposit.findOne({
     _id: req.params.id,
     userId: req.user._id
-  }).populate('methodId', 'name networkCode address qrPath');
+  }).populate('methodId', 'name networkCode address qrCode');
 
   if (!deposit) {
     return next(new ErrorHandler('Deposit not found', 404));
@@ -261,7 +261,7 @@ const getAllDeposits = catchAsyncError(async (req, res, next) => {
 
   const deposits = await Deposit.find(query)
     .populate('userId', 'phone')
-    .populate('methodId', 'name networkCode address qrPath')
+    .populate('methodId', 'name networkCode address qrPath qrCode')
     .sort({ createdAt: -1 })
     .limit(limit * 1)
     .skip((page - 1) * limit)
