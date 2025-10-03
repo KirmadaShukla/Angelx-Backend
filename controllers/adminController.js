@@ -9,6 +9,76 @@ const { generateToken } = require('../middleware/auth');
 const catchAsyncError = require('../utils/catchAsyncError');
 const sendToken = require('../utils/sendToken');
 const { ErrorHandler } = require('../utils/ErrorHandler');
+const cloudinary = require('../config/cloudinary');
+
+// Helper function to upload image to Cloudinary
+const uploadToCloudinary = async (file) => {
+  try {
+    let result;
+    
+    // Check if file is stored in memory (buffer) or as a temp file
+    if (file.data) {
+      // File is in memory as buffer
+      result = await cloudinary.uploader.upload_stream(
+        {
+          folder: 'deposit_qr_codes',
+          resource_type: 'image'
+        },
+        (error, uploadResult) => {
+          if (error) {
+            throw error;
+          }
+          return uploadResult;
+        }
+      ).end(file.data);
+      
+      // Need to promisify since upload_stream uses callback
+      result = await new Promise((resolve, reject) => {
+        const upload_stream = cloudinary.uploader.upload_stream(
+          {
+            folder: 'deposit_qr_codes',
+            resource_type: 'image'
+          },
+          (error, uploadResult) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(uploadResult);
+            }
+          }
+        );
+        upload_stream.end(file.data);
+      });
+    } else if (file.tempFilePath) {
+      // File is stored as temporary file
+      result = await cloudinary.uploader.upload(file.tempFilePath, {
+        folder: 'deposit_qr_codes',
+        resource_type: 'image'
+      });
+    } else {
+      throw new Error('No file data found');
+    }
+    
+    return {
+      publicId: result.public_id,
+      url: result.secure_url
+    };
+  } catch (error) {
+    throw new ErrorHandler('Error uploading to Cloudinary: ' + error.message, 500);
+  }
+};
+
+// Helper function to delete image from Cloudinary
+const deleteFromCloudinary = async (publicId) => {
+  try {
+    if (publicId) {
+      await cloudinary.uploader.destroy(publicId);
+    }
+  } catch (error) {
+    // Log the error but don't throw as this shouldn't block the main operation
+    console.error('Error deleting from Cloudinary:', error.message);
+  }
+};
 
 // @desc    Register initial admin user
 // @access  Public
@@ -268,7 +338,22 @@ const getAdminProfile = catchAsyncError(async (req, res, next) => {
 });
 
 const createDepositMethod = catchAsyncError(async (req, res, next) => {
-  const { name, networkCode, address, qrPath } = req.body;
+  const { name, networkCode, address } = req.body;
+  
+  // Check if QR code file is uploaded
+  let qrCode = null;
+  
+  if (req.files && req.files.qr) {
+    const qrFile = req.files.qr;
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(qrFile.mimetype)) {
+      return next(new ErrorHandler('Invalid file type. Only JPEG, JPG, PNG, and GIF files are allowed.', 400));
+    }
+    
+    // Upload to Cloudinary
+    qrCode = await uploadToCloudinary(qrFile);
+  }
   
   if (!name || !networkCode || !address) {
     return next(new ErrorHandler('Name, network code, and address are required', 400));
@@ -284,7 +369,13 @@ const createDepositMethod = catchAsyncError(async (req, res, next) => {
     name: name.trim(),
     networkCode: networkCode.trim(),
     address: address.trim(),
-    qrPath: qrPath ? qrPath.trim() : null
+    qrCode: qrCode ? {
+      url: qrCode.url,
+      publicId: qrCode.publicId
+    } : {
+      url: null,
+      publicId: null
+    }
   });
 
   await depositMethod.save();
@@ -316,7 +407,7 @@ const getDepositMethods = catchAsyncError(async (req, res, next) => {
 // @desc    Update deposit method
 // @access  Private (Admin)
 const updateDepositMethod = catchAsyncError(async (req, res, next) => {
-  const { name, address, qrPath, isActive } = req.body;
+  const { name, address, isActive } = req.body;
   
   const method = await DepositMethod.findById(req.params.id);
   
@@ -324,9 +415,30 @@ const updateDepositMethod = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler('Deposit method not found', 404));
   }
 
+  // Check if QR code file is uploaded
+  if (req.files && req.files.qr) {
+    const qrFile = req.files.qr;
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(qrFile.mimetype)) {
+      return next(new ErrorHandler('Invalid file type. Only JPEG, JPG, PNG, and GIF files are allowed.', 400));
+    }
+    
+    // Delete previous QR from Cloudinary if exists
+    if (method.qrCode && method.qrCode.publicId) {
+      await deleteFromCloudinary(method.qrCode.publicId);
+    }
+    
+    // Upload new QR to Cloudinary
+    const qrData = await uploadToCloudinary(qrFile);
+    method.qrCode = {
+      url: qrData.url,
+      publicId: qrData.publicId
+    };
+  }
+
   if (name) method.name = name.trim();
   if (address) method.address = address.trim();
-  if (qrPath !== undefined) method.qrPath = qrPath ? qrPath.trim() : null;
   if (typeof isActive === 'boolean') method.isActive = isActive;
 
   await method.save();
@@ -347,6 +459,11 @@ const deleteDepositMethod = catchAsyncError(async (req, res, next) => {
   
   if (!method) {
     return next(new ErrorHandler('Deposit method not found', 404));
+  }
+
+  // Delete QR from Cloudinary if exists
+  if (method.qrCode && method.qrCode.publicId) {
+    await deleteFromCloudinary(method.qrCode.publicId);
   }
 
   await DepositMethod.findByIdAndDelete(req.params.id);

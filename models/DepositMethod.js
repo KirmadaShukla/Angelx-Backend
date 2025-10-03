@@ -17,9 +17,15 @@ const depositMethodSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  qrPath: {
-    type: String,
-    default: null
+  qrCode: {
+    url: {
+      type: String,
+      default: null
+    },
+    publicId: {
+      type: String,
+      default: null
+    }
   },
   isActive: {
     type: Boolean,
