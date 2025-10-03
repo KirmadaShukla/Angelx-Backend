@@ -57,7 +57,7 @@ const createDeposit = catchAsyncError(async (req, res, next) => {
   await deposit.save();
 
   // Populate method details
-  await deposit.populate('methodId', 'name networkCode address qrPath');
+  await deposit.populate('methodId', 'name networkCode address qrPath qrCode');
 
   res.status(201).json({
     success: true,
